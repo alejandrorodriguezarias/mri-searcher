@@ -31,7 +31,10 @@
 	     <configuration>
 	      <mainClass>mri_searcher.mri_searcher.App</mainClass>
 	      <arguments>
-	       <argument></argument>
+	       <argument>-index</argument>
+	       <argument>index</argument>
+	       <argument>-coll</argument>
+	       <argument>Collection</argument>
 	      </arguments>
 	     </configuration>
 	    </execution>
