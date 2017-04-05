@@ -9,7 +9,7 @@ public class Metricas {
 	 * Métrica de precisión P@n: Coge los primeros n resultados, obtiene cuantos de estos son relevantes y
 	 * lo divide por el parámetro n
 	 * @param n - parámetro de P@n
-	 * @param docs - lista de resultados de la búsqueda
+	 * @param docs - lista de ¡¡ CAMPOS i !! de los resultados de la búsqueda
 	 * @param rels - lista de documentos relevantes conocidos previamente
 	 * @return el valor de precisión según esta métrica
 	 */
@@ -23,7 +23,7 @@ public class Metricas {
 	 * Métrica de precisión Recall@n: Coge los primeros n resultados, obtiene cuantos de estos son relevantes
 	 * y divide por el número total de relevantes posibles.
 	 * @param n - parámetro de Recall@n
-	 * @param docs - lista de resultados de la búsqueda
+	 * @param docs - lista de ¡¡ CAMPOS i !! de los resultados de la búsqueda
 	 * @param rels - lista de documentos relevantes conocidos previamente
 	 * @return el valor de precisión según esta métrica
 	 */
