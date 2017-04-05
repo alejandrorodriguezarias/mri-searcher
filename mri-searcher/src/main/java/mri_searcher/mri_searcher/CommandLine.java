@@ -17,7 +17,6 @@ class CommandLine {
 			if(args[i].startsWith("-")) {
 				if(sb.length() != 0) {
 					sb.deleteCharAt(sb.length()-1); // remove trailing whitespace
-					System.out.println("Parsed " + current + " argument with " + sb.toString() + " options");
 					opts.put(current, sb.toString()); // add to dict
 					sb.setLength(0); // reset length
 				}
@@ -30,12 +29,9 @@ class CommandLine {
 		// Add remaining options
 		if(sb.length() != 0) {
 			sb.deleteCharAt(sb.length()-1); // remove trailing whitespace
-			System.out.println("Parsed " + current + " argument with " + sb.toString() + " options");
 			opts.put(current, sb.toString()); // add to dict
 			sb.setLength(0); // reset length
 		}
-		
-		System.out.println("Parsed options " + opts.keySet());
 	}
 
 	/**
@@ -74,13 +70,8 @@ class CommandLine {
 		for(int i=0; i<opts.length; i++) {
 			boolean partial = true;
 			for(int j=0; j<opts[i].length; j++) {
-				if(hasOpt(opts[i][j]))
-					System.out.println("We have opt " + opts[i][j]);
-				else
-					System.out.println("We dont have " + opts[i][j]);
 				partial &= hasOpt(opts[i][j]); // elementos del mismo array son necesarios (AND)
 			}
-			System.out.println("Result is " + partial);
 			result |= partial; // cada uno de los arrays es suficiente (OR)
 		}
 		return result;
@@ -91,9 +82,7 @@ class CommandLine {
 	 * a una operación de creación de índices (parte 1 de la práctica)
 	 */
 	public boolean isIndexing() {
-		//String[] indexingOpts1 = {"-index","-coll"};
-		String[] indexingOpts1 = {"-index","-indexingmodel","-coll"};
-		String[][] indexingOpts = {indexingOpts1};
+		String[][] indexingOpts = {{"-index","-indexingmodel","-coll"}};
 		return checkPresent(indexingOpts);
 	}
 	
@@ -101,30 +90,11 @@ class CommandLine {
 	 * Establece si los argumentos entregados por línea de comandos corresponden
 	 * a una operación de procesamiento de índice (parte 2 de la práctica)
 	 */
-	/*
 	public boolean isSearching() {
-		String[] queringOpts1 = {"-indexin","-best_idfterms"};
-		String[] queringOpts2 = {"-indexin","-poor_idfterms"};
-		String[] queringOpts3 = {"-indexin","-best_tfidfterms"};
-		String[] queringOpts4 = {"-indexin","-poor_tfidfterms"};
-		String[][] queringOpts = {queringOpts1, queringOpts2, queringOpts3, queringOpts4};
+		String[][] queringOpts = {{"-search","-indexin","-cut","-top","-queries","-fieldsproc","-fieldsvisual"}};
 		return checkPresent(queringOpts);
 	}
 
-	/**
-	 * Establece si los argumentos entregados por línea de comandos corresponden
-	 * a una operación de reconstrucción de índice (parte 3 de la práctica)
-	 */
-	/*
-	public boolean isRebuilding() {
-		String[] rebuildingOpts1 = {"-indexin","-deldocsterm"};
-		String[] rebuildingOpts2 = {"-indexin","-deldocsquery"};
-		String[] rebuildingOpts3 = {"-indexin","-indexout","-mostsimilardoc_title"};
-		String[] rebuildingOpts4 = {"-indexin","-indexout","-mostsimilardoc_body"};
-		String[][] rebuildingOpts = {rebuildingOpts1, rebuildingOpts2, rebuildingOpts3, rebuildingOpts4};
-		return checkPresent(rebuildingOpts);
-	}
-	*/
 	class MissingArgumentException extends Exception {
 		private static final long serialVersionUID = 7146926153071567017L;
 	}
