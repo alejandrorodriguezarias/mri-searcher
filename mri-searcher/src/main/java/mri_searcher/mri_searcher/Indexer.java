@@ -30,6 +30,7 @@ import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -48,18 +49,21 @@ public class Indexer {
 	protected final Path indexPath;
 	protected final Path docsPath;
 	protected final OpenMode openMode;
+	final Similarity similarity;
 	final SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT,Locale.ENGLISH); // SimpleDateFormat is not thread-safe
 
-	public Indexer(Path indexPath, Path docs, OpenMode openMode) {
+	public Indexer(Path indexPath, Path docs, OpenMode openMode, Similarity similarity) {
 		this.indexPath = indexPath;
 		this.docsPath = docs;
 		this.openMode = openMode;
+		this.similarity = similarity;
 	}
 
 	public void index() throws IOException {
 		Directory dir = FSDirectory.open(indexPath);
 		Analyzer analyzer = new StandardAnalyzer();
-		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+		IndexWriterConfig iwc = new IndexWriterConfig(analyzer).setSimilarity(similarity);
+		//iwc.setSimilarity(new BM25Similarity(1.2, 0.75)); Son los valores por defecto
 		iwc.setOpenMode(openMode);
 		try (IndexWriter writer = new IndexWriter(dir, iwc)) {
 			indexDocs(writer, docsPath);
@@ -103,15 +107,15 @@ public class Indexer {
 				// make a new, empty document
 				Document doc = new Document();
 
-				// Host del que proceden los archivos
+				/* Host del que proceden los archivos
 				Field hostField = new StringField("host", hostname, Store.YES);
-				doc.add(hostField);
-				// Ruta de los archivos
+				doc.add(hostField);*/
+				/* Ruta de los archivos
 				Field pathField = new StringField("path", file.toString(), Store.YES);
-				doc.add(pathField);
-				// Número de artículo dentro del archivo
+				doc.add(pathField);*/
+				/* Número de artículo dentro del archivo
 				Field orderField = new StringField("order", new Integer(artn).toString(), Store.YES);
-				doc.add(orderField);
+				doc.add(orderField);*/
 				// Campos propios del artículo
 				int i = 0;
 				Field I = new Field("I", art.get(i++), CustomFields.TYPE_STORED);
@@ -126,10 +130,10 @@ public class Indexer {
 				doc.add(W);
 				Instant now = Instant.now();
 				Date dateNow = Date.from(now);
-				Field indexedDate = new LongPoint("msIndexed", dateNow.getTime());
+				/*Field indexedDate = new LongPoint("msIndexed", dateNow.getTime());
 				Field stringDate = new TextField("dateIndexed", DateTools.dateToString(dateNow, Resolution.MILLISECOND), Store.YES);
 				doc.add(indexedDate);
-				doc.add(stringDate);
+				doc.add(stringDate);*/
 				//System.out.println(titleField.stringValue() + " " + topicsField.stringValue() + " " + datelineField.stringValue() + " " + dateField.stringValue());
 				writer.addDocument(doc);
 			}

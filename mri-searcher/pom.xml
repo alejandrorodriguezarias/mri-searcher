@@ -35,6 +35,9 @@
 	       <argument>index</argument>
 	       <argument>-coll</argument>
 	       <argument>Collection</argument>
+	       <argument>-indexingmodel</argument>
+	       <argument>dir</argument>
+	       <argument>2000</argument>
 	      </arguments>
 	     </configuration>
 	    </execution>

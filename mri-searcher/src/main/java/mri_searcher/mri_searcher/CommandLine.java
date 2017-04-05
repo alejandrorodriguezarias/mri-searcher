@@ -91,9 +91,9 @@ class CommandLine {
 	 * a una operación de creación de índices (parte 1 de la práctica)
 	 */
 	public boolean isIndexing() {
-		String[] indexingOpts1 = {"-index","-coll"};
-		String[] indexingOpts2 = {"-index","-indexingmodel","-coll"};
-		String[][] indexingOpts = {indexingOpts1, indexingOpts2};
+		//String[] indexingOpts1 = {"-index","-coll"};
+		String[] indexingOpts1 = {"-index","-indexingmodel","-coll"};
+		String[][] indexingOpts = {indexingOpts1};
 		return checkPresent(indexingOpts);
 	}
 	
