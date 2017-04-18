@@ -2,18 +2,15 @@ package mri_searcher.mri_searcher;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
 
+import org.apache.lucene.analysis.miscellaneous.LengthFilter;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
@@ -24,12 +21,14 @@ import mri_searcher_util.Visualizar;
 
 public class Searcher {
 
-	Path indexIn;
-	int cut;
-	int top;
-	String queryRange;
-	String[] fieldsproc;
-	String[] fieldsvisual;
+	private static int MAXQUERY = 225;
+	
+	private Path indexIn;
+	private int cut;
+	private int top;
+	private String queryRange;
+	private String[] fieldsproc;
+	private String[] fieldsvisual;
 	
 	public Searcher(Path indexIn, int cut, int top, String queryRange, String[] fieldsproc, String[] fieldvisual) {
 		this.indexIn = indexIn;
@@ -41,9 +40,29 @@ public class Searcher {
 	}
 
 	private int[] rangeParser(String range) {
-		return null;
+		int[] array;
+		int start;
+		int end;
+		if(range.equals("all")) {
+			start = 1;
+			end = MAXQUERY;
+		} else {
+			String[] s = range.split("-");
+			if(s.length == 2) {
+				start = Integer.parseInt(s[0]);
+				end = Integer.parseInt(s[1]);
+			} else {
+				start = end = Integer.parseInt(s[0]);
+			}
+		}
+		array = new int[end-start+1];
+		int j = 0;
+		for(int i=start; i<end; i++) {
+			array[j++] = i;
+		}
+		return array;
 	}
-	
+
 	public void search() {
 		try (
 				Directory dirIn = FSDirectory.open(indexIn);
@@ -67,7 +86,7 @@ public class Searcher {
 				}
 			}
 		
-			Visualizar.visualizar(queryNumbers, reader, topDocs, fieldsvisual);
+			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, fieldsvisual));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
