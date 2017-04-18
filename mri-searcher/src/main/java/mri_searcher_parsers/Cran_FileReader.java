@@ -13,59 +13,67 @@ import java.util.Arrays;
 
 public class Cran_FileReader {
 
-	//Recibe por parametros el path de un fichero y devuelve la lista de querys del mismo.
-	public static final ArrayList<String> readQuery(String path) throws IOException {
-
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		String temporal = new String(encoded, StandardCharsets.UTF_8);
-		String[] temporal2 = temporal.split(".I");
-
-		ArrayList<String> listaquery = new ArrayList<String>();
-
-		// Elimina el numero en la query
-		for (int i = 1;i<2; i++) {
-			listaquery.add(temporal2[i].split(".W")[1].replace('\n',' '));
-			System.out.println(listaquery.get(i-1));
-			
-		}
-		return listaquery;
-	}
-	
-	public static final ArrayList<String> readRelevance(String path) throws NumberFormatException, IOException {
-	String line;
-	
-    InputStream fis = new FileInputStream(path);
-    InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-    BufferedReader br = new BufferedReader(isr);
-    ArrayList<String> listarelev = new ArrayList<String>();
-    
-    while ((line = br.readLine()) != null) {
-    	String [] temporal = line.split(" ");
-    	int indice = Integer.parseInt(temporal[0]);
-    	if (listarelev.size()<indice) {
-    		listarelev.add(temporal[1]);
-    	}else {
-    	String tmp =  listarelev.get(indice-1);
-    	tmp = tmp + "," + temporal[1];
-    	listarelev.set(indice-1,tmp);
-    	}
-    }
-    for (int i = 0;i<listarelev.size(); i++) {
-		System.out.println(listarelev.get(i));
-	}
-		return listarelev;
-	}
-}	
-	/*public static void main( String[] args){
-		
+	// Recibe por parametros el path de un fichero y devuelve la lista de querys
+	// del mismo.
+	public static final ArrayList<String> readQuery(String path) {
 		try {
-			readRelevance("/home/alejandro/git/mri-searcher/cran/cranqrel");
+			byte[] encoded = Files.readAllBytes(Paths.get(path));
+			String temporal = new String(encoded, StandardCharsets.UTF_8);
+			String[] temporal2 = temporal.split(".I");
+
+			ArrayList<String> listaquery = new ArrayList<String>();
+
+			// Elimina el numero en la query
+			for (int i = 1; i < 2; i++) {
+				listaquery.add(temporal2[i].split(".W")[1].replace('\n', ' '));
+				System.out.println(listaquery.get(i - 1));
+
+			}
+			return listaquery;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			System.err.println("No se pudo leer el fichero");
+			System.exit(1);
+			return null;
 		}
-		
 	}
 
-}*/
+	public static final ArrayList<String> readRelevance(String path) {
+		try {
+			String line;
+
+			InputStream fis = new FileInputStream(path);
+			InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+			BufferedReader br = new BufferedReader(isr);
+			ArrayList<String> listarelev = new ArrayList<String>();
+
+			while ((line = br.readLine()) != null) {
+				String[] temporal = line.split(" ");
+				int indice = Integer.parseInt(temporal[0]);
+				if (listarelev.size() < indice) {
+					listarelev.add(temporal[1]);
+				} else {
+					String tmp = listarelev.get(indice - 1);
+					tmp = tmp + "," + temporal[1];
+					listarelev.set(indice - 1, tmp);
+				}
+			}
+			for (int i = 0; i < listarelev.size(); i++) {
+				System.out.println(listarelev.get(i));
+			}
+			return listarelev;
+		} catch (NumberFormatException | IOException e) {
+			System.exit(1);
+			return null;
+		}
+	}
+}
+/*
+ * public static void main( String[] args){
+ * 
+ * try { readRelevance("/home/alejandro/git/mri-searcher/cran/cranqrel"); }
+ * catch (IOException e) { // TODO Auto-generated catch block
+ * e.printStackTrace(); System.err.println("No se pudo leer el fichero"); }
+ * 
+ * }
+ * 
+ * }
+ */

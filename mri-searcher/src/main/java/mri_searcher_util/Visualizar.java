@@ -52,12 +52,12 @@ public class Visualizar {
 		sb.append("Métricas: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20] + " Recall@20 " + metricas[R20]);		
 	}
 	
-	public static final String visualizar(int[] queries, IndexReader reader, TopDocs topDocs, final String[] fields) throws IOException {
+	public static final String visualizar(int[] queries, IndexReader reader, TopDocs[] topDocs, final String[] fields) throws IOException {
 		float sumP10 = 0f, sumR10 = 0f, sumP20 = 0f, sumR20 = 0f;
 		float[] metricas = new float[4];
 		StringBuilder sb = new StringBuilder();
 		for(int i=0; i<queries.length; i++) {
-			presentarQuery(sb, queries[i], reader, topDocs, fields, metricas);
+			presentarQuery(sb, queries[i], reader, topDocs[i], fields, metricas);
 			sumP10 += metricas[P10];
 			sumR10 += metricas[R10];
 			sumP20 += metricas[P20];
