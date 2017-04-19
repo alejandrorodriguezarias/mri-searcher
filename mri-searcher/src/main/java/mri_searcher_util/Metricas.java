@@ -32,4 +32,33 @@ public class Metricas {
 		int intersec = ndocs.stream().filter(rels::contains).collect(Collectors.toSet()).size();
 		return intersec / (float) rels.size();
 	}
+	
+	/*AP CALCULA LA PRECISION POR APARICION ES DECIR
+	  no relevante
+	  relevante  1/2
+	  no relevante
+	  relevante   2/4
+	  no relevante
+	  no relevante
+	  relevante 3/7
+	  HASTA VALOR CUT
+	  
+	  AP = 1/2 + 1/4 + 1/7
+	  		--------------
+	  		total queriesrelevantes
+	  		
+	*/
+	static final float AveragePrecision(List<Integer> totales, List<Integer> relevantes, int cut) {
+		float sumAP = 0;
+		int numRel = 0;
+		for (int i = 0;i< cut;i++)  {
+			if (relevantes.contains(totales.get(i))){
+				numRel++;
+				sumAP += (numRel/(i+1));
+			}
+			
+		}
+		return sumAP/relevantes.size();
+		
+	}
 }

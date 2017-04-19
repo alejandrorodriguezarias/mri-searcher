@@ -81,13 +81,14 @@ public class Searcher {
 				try {
 					query = queryParser.parse(queryContent);
 					//20 NUM DOCS NECESARIO PARA RECALL20 Y P20
-					topDocs[i] = searcher.search(query, 20);
+					
+					topDocs[i] = searcher.search(query, cut > 20 ? cut : 20);
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
 				}
 			}
-			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, fieldsvisual));
+			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, fieldsvisual,top,cut));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

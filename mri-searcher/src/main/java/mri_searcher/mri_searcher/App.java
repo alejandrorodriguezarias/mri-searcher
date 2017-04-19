@@ -43,6 +43,7 @@ public class App {
 	}
 	
 	public static void searching(CommandLine cl) {
+		
 		Path indexin = Paths.get(cl.getOpt("-indexin"));
 		Integer cut = Integer.parseInt(cl.getOpt("-cut"));
 		Integer top = Integer.parseInt(cl.getOpt("-top"));
