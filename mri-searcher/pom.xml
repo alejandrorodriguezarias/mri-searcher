@@ -31,13 +31,26 @@
 	     <configuration>
 	      <mainClass>mri_searcher.mri_searcher.App</mainClass>
 	      <arguments>
-	       <argument>-index</argument>
+	       <argument>-search</argument>
+	      <argument>default</argument>
+	       <argument>-indexin</argument>
+	       <argument>index</argument>
+	       <argument>-cut</argument>
+	       <argument>2</argument>
+	       <argument>-top</argument>
+	       <argument>8</argument>
+	       <argument>-queries</argument>
+	       <argument>2</argument>
+	       <argument>-fieldsproc</argument>
+	       <argument>T</argument>
+	       <argument>-fieldsvisual</argument>
+	       <argument>T,W,B</argument>
+	      <!-- <argument>-index</argument>
 	       <argument>index</argument>
 	       <argument>-coll</argument>
 	       <argument>Collection</argument>
 	       <argument>-indexingmodel</argument>
-	       <argument>dir</argument>
-	       <argument>2000</argument>
+	       <argument>default</argument> -->
 	      </arguments>
 	     </configuration>
 	    </execution>

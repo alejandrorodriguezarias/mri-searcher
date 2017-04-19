@@ -24,13 +24,14 @@ public class Cran_FileReader {
 			ArrayList<String> listaquery = new ArrayList<String>();
 
 			// Elimina el numero en la query
-			for (int i = 1; i < 2; i++) {
-				listaquery.add(temporal2[i].split(".W")[1].replace('\n', ' '));
-				System.out.println(listaquery.get(i - 1));
-
+			for (int i = 1; i < temporal2.length; i++) {
+				
+				listaquery.add(temporal2[i].split(".W")[1]);
 			}
 			return listaquery;
+			
 		} catch (IOException e) {
+			e.printStackTrace();
 			System.exit(1);
 			return null;
 		}
@@ -56,11 +57,10 @@ public class Cran_FileReader {
 					listarelev.set(indice - 1, tmp);
 				}
 			}
-			for (int i = 0; i < listarelev.size(); i++) {
-				System.out.println(listarelev.get(i));
-			}
+			
 			return listarelev;
 		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
 			System.exit(1);
 			return null;
 		}

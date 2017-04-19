@@ -122,11 +122,11 @@ public class Indexer {
 				doc.add(I);
 				Field T = new Field("T", art.get(i++), CustomFields.TYPE_STORED);
 				doc.add(T);
-				Field A = new TextField("A", art.get(i++), Store.NO);
+				Field A = new Field("A", art.get(i++), CustomFields.TYPE_STORED);
 				doc.add(A);
-				Field B = new TextField("B", art.get(i++), Store.NO);
+				Field B = new Field("B", art.get(i++), CustomFields.TYPE_STORED);
 				doc.add(B);
-				Field W = new TextField("W", art.get(i++), Store.NO);
+				Field W = new Field("W", art.get(i++), CustomFields.TYPE_STORED);
 				doc.add(W);
 				Instant now = Instant.now();
 				Date dateNow = Date.from(now);

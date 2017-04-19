@@ -49,7 +49,6 @@ public class App {
 		String queries = cl.getOpt("-queries");
 		String[] fieldsproc = cl.getOpt("-fieldsproc").split(",");
 		String[] fieldsvisual = cl.getOpt("-fieldsvisual").split(",");
-		
 		Searcher searcher = new Searcher(indexin, cut, top, queries, fieldsproc, fieldsvisual);
 		searcher.search();
 	}

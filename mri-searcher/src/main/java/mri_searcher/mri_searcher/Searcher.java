@@ -2,6 +2,7 @@ package mri_searcher.mri_searcher;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 import org.apache.lucene.analysis.miscellaneous.LengthFilter;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -57,7 +58,7 @@ public class Searcher {
 		}
 		array = new int[end-start+1];
 		int j = 0;
-		for(int i=start; i<end; i++) {
+		for(int i=start; i<=end; i++) {
 			array[j++] = i;
 		}
 		return array;
@@ -79,13 +80,13 @@ public class Searcher {
 				String queryContent = DiccionarioQueries.getContent(queryNumbers[i]);
 				try {
 					query = queryParser.parse(queryContent);
-					topDocs[i] = searcher.search(query, top);
+					//20 NUM DOCS NECESARIO PARA RECALL20 Y P20
+					topDocs[i] = searcher.search(query, 20);
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
 				}
 			}
-		
 			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, fieldsvisual));
 		} catch (IOException e) {
 			e.printStackTrace();
