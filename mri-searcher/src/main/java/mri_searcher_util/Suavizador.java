@@ -5,7 +5,7 @@ import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.LMJelinekMercerSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 
-
+//Devuelve el suav para la indexacion o busqueda
 
 public class Suavizador {
 	
