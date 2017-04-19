@@ -31,7 +31,16 @@
 	     <configuration>
 	      <mainClass>mri_searcher.mri_searcher.App</mainClass>
 	      <arguments>
+	       <argument>-index</argument>
+	       <argument>index</argument>
+	       <argument>-coll</argument>
+	       <argument>Collection</argument>
+	       <argument>-indexingmodel</argument>
+	       <argument>jm</argument>
+	       <argument>0.2</argument>
 	       <argument>-search</argument>
+	       <argument>jm</argument>
+	       <argument>0.2</argument>
 	      <argument>default</argument>
 	       <argument>-indexin</argument>
 	       <argument>index</argument>
@@ -40,17 +49,12 @@
 	       <argument>-top</argument>
 	       <argument>2</argument>
 	       <argument>-queries</argument>
-	       <argument>2</argument>
+	       <argument>2-4</argument>
 	       <argument>-fieldsproc</argument>
 	       <argument>T</argument>
 	       <argument>-fieldsvisual</argument>
 	       <argument>T,W,B</argument>
-	      <!-- <argument>-index</argument>
-	       <argument>index</argument>
-	       <argument>-coll</argument>
-	       <argument>Collection</argument>
-	       <argument>-indexingmodel</argument>
-	       <argument>default</argument> -->
+	      
 	      </arguments>
 	     </configuration>
 	    </execution>

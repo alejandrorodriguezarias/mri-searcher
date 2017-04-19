@@ -11,13 +11,10 @@ import org.apache.lucene.search.similarities.LMJelinekMercerSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 
 import mri_searcher.mri_searcher.CommandLine.MissingArgumentException;
+import mri_searcher_util.Suavizador;
 
-/**
- * Hello world!
- *
- */
 public class App {
-	/* Sin hacer */
+	
 
 	final static String usage = "java es.udc.fic.mri_indexer.IndexFiles"
 			+ " -index INDEX_PATH -coll DOC_PATH [-openmode CREATE|CREATE_OR_APPEND|APPEND]"
@@ -36,7 +33,8 @@ public class App {
 		if (cl.isIndexing()) {
 			System.out.println("Starting indexing");
 			indexing(cl); // primera parte de la práctica
-		} else if (cl.isSearching()) {
+		}
+		if (cl.isSearching()) {
 			System.out.println("Starting search");
 			searching(cl); // segunda parte de la práctica
 		}
@@ -50,7 +48,13 @@ public class App {
 		String queries = cl.getOpt("-queries");
 		String[] fieldsproc = cl.getOpt("-fieldsproc").split(",");
 		String[] fieldsvisual = cl.getOpt("-fieldsvisual").split(",");
-		Searcher searcher = new Searcher(indexin, cut, top, queries, fieldsproc, fieldsvisual);
+		// INDEXINGMODEL
+		String[] suavizadores = null;
+		Similarity suav = null;
+		suavizadores = cl.getOpt("-search").split(" ");
+		// Default o número erroneo de parametros
+		suav = Suavizador.seleccionarsuav(suavizadores);
+		Searcher searcher = new Searcher(indexin, cut, top, queries, fieldsproc, fieldsvisual,suav);
 		searcher.search();
 	}
 
@@ -75,34 +79,7 @@ public class App {
 		Similarity suav = null;
 		suavizadores = cl.getOpt("-indexingmodel").split(" ");
 		// Default o número erroneo de parametros
-		if (suavizadores.length < 2) {
-			if (suavizadores[0].equals("default")) {
-				suav = new BM25Similarity();
-			} else {
-				System.err.println("Not enough arguments");
-				System.err.println(usage);
-				System.exit(1);
-			}
-		} else {
-			// Jelinek-Mercer
-			if (suavizadores[0].equals("jm")) {
-				float lambda = Float.parseFloat(suavizadores[1]);
-				suav = new LMJelinekMercerSimilarity(lambda);
-			} else {
-				// Dirichlet
-				if (suavizadores[0].equals("dir")) {
-					float mu = Float.parseFloat(suavizadores[1]);
-					suav = new LMDirichletSimilarity(mu);
-				} else {
-					// Argumetno erroneo
-					System.err.println("Not enough arguments");
-					System.err.println(usage);
-					System.exit(1);
-				}
-
-			}
-
-		}
+		suav = Suavizador.seleccionarsuav(suavizadores);
 
 		if (cl.hasOpt("-index")) {
 			// single thread

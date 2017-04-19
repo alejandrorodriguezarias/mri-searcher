@@ -14,6 +14,7 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -30,14 +31,16 @@ public class Searcher {
 	private String queryRange;
 	private String[] fieldsproc;
 	private String[] fieldsvisual;
+	private Similarity suav;
 	
-	public Searcher(Path indexIn, int cut, int top, String queryRange, String[] fieldsproc, String[] fieldvisual) {
+	public Searcher(Path indexIn, int cut, int top, String queryRange, String[] fieldsproc, String[] fieldvisual, Similarity suav) {
 		this.indexIn = indexIn;
 		this.cut = cut;
 		this.top = top;
 		this.queryRange = queryRange;
 		this.fieldsproc = fieldsproc;
 		this.fieldsvisual = fieldvisual;
+		this.suav = suav;
 	}
 
 	private int[] rangeParser(String range) {
@@ -70,6 +73,7 @@ public class Searcher {
 				IndexReader reader = DirectoryReader.open(dirIn);
 				) {
 			IndexSearcher searcher = new IndexSearcher(reader);
+			searcher.setSimilarity(suav);
 			QueryParser queryParser = new MultiFieldQueryParser(fieldsproc, new StandardAnalyzer());
 			
 			int[] queryNumbers = rangeParser(queryRange);
@@ -92,5 +96,5 @@ public class Searcher {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+	}	
 }
