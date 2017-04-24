@@ -57,10 +57,8 @@
 	       <argument>T</argument>
 	       <argument>-fieldsvisual</argument>
 	       <argument>T,B</argument>
-	       <argument>-rf1</argument>
-	       <argument>8</argument>
-	       <argument>10</argument>
-	       <argument>5</argument>
+	       <argument>-rf2</argument>
+	       <argument>3</argument>
 	      </arguments>
 	     </configuration>
 	    </execution>

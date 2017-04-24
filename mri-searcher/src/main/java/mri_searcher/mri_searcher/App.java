@@ -57,8 +57,9 @@ public class App {
 			rfMode = 1;
 		}
 		if(cl.hasOpt("-rf2")) {
-			String opt = cl.getOpt("-rf1");
+			String opt = cl.getOpt("-rf2");
 			ndr = Integer.parseInt(opt);
+			System.err.println(ndr);
 			rfMode = 2;
 		}
 		String queries = cl.getOpt("-queries");

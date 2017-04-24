@@ -96,25 +96,31 @@ public class Searcher {
 				Query query;
 				String queryContent = DiccionarioQueries.getContent(queryNumbers[i]);
 				try {
-					query = queryParser.parse(queryContent);
-					//20 NUM DOCS NECESARIO PARA RECALL20 Y P20
-					
+					query = queryParser.parse(queryContent);		
 					topDocs[i] = searcher.search(query, DOCLIMIT);
-					System.err.println("HOLI");
-					List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
-					System.err.println("HOLI2");
-					String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
-					System.err.println("HOLI3");
-					Query expQuery = queryExpandida(queryContent, tfidf, idf);
-					System.err.println("HOLI4" + top);
-					expDocs[i] = searcher.search(expQuery, DOCLIMIT);//xk wea ponia i???
-					System.err.println("HOLI5");
+					Query expQuery = null;
+					if (rfMode==1) {
+						List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
+						String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
+						expQuery = queryExpandida(queryContent, tfidf, idf);
+					} else if (rfMode==2){
+						System.err.println("HOLA");
+						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
+						System.err.println("HOLA2");
+						expQuery = queryExpandidatitulo(queryContent, titulos);
+						System.err.println("HOLA3");
+					}
+					
+					if (rfMode !=0){
+					expDocs[i] = searcher.search(expQuery, DOCLIMIT);
+					}
+					
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
 				}
 			}
-			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, expDocs, fieldsvisual,top,cut));
+			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, expDocs, fieldsvisual,top,cut,rfMode));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -126,6 +132,14 @@ public class Searcher {
 		for(String s : idf) sb.append(s+ " ");
 		sb.append("\n");
 		for(String s : tfidf) sb.append(s + " ");
+		System.err.println(sb.toString());
+		return queryParser.parse(sb.toString());
+	}
+	
+	private Query queryExpandidatitulo (String queryContent, List<String> titulos) throws ParseException {
+		StringBuilder sb = new StringBuilder();
+		sb.append(queryContent);
+		for(String s : titulos) sb.append(s+ " ");
 		System.err.println(sb.toString());
 		return queryParser.parse(sb.toString());
 	}

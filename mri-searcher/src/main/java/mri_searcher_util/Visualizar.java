@@ -46,7 +46,7 @@ public class Visualizar {
 	}
 
 	private static void presentarQuery(StringBuilder sb, int query, IndexReader reader, TopDocs topDocs,
-			TopDocs expDocs, final String[] fields, float[] metricas, int top, int cut) throws IOException {
+			TopDocs expDocs, final String[] fields, float[] metricas, int top, int cut, int rfMode) throws IOException {
 		String queryName = DiccionarioQueries.getContent(query);
 		List<Integer> resultados = new ArrayList<>();
 		List<Integer> expresultados = new ArrayList<>();
@@ -56,9 +56,10 @@ public class Visualizar {
 		sb.append("Query " + query + ": " + queryName); // PRINT: LA QUERY
 
 		presentarDocumentos(sb, reader, topDocs, fields, resultados, relevantes, top);
-		
-		sb.append("Query " + query + ": EXPANDIDA"); // PRINT: LA QUERY
-		presentarDocumentos(sb, reader, expDocs, fields, expresultados, relevantes, top);
+		if (rfMode !=0) {
+			sb.append("Query " + query + ": EXPANDIDA"); // PRINT: LA QUERY
+			presentarDocumentos(sb, reader, expDocs, fields, expresultados, relevantes, top);
+		}
 
 		// Obtenemos las métricas
 		metricas[P10] = Metricas.Patn(10, resultados, relevantes);
@@ -72,12 +73,12 @@ public class Visualizar {
 	}
 
 	public static final String visualizar(int[] queries, IndexReader reader, TopDocs[] topDocs, TopDocs[] expDocs,
-			final String[] fields, int top, int cut) throws IOException {
+			final String[] fields, int top, int cut, int rfMode) throws IOException {
 		float sumP10 = 0f, sumR10 = 0f, sumP20 = 0f, sumR20 = 0f, sumAP = 0f;
 		float[] metricas = new float[5];
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < queries.length; i++) {
-			presentarQuery(sb, queries[i], reader, topDocs[i], expDocs[i], fields, metricas, top, cut);
+			presentarQuery(sb, queries[i], reader, topDocs[i], expDocs[i], fields, metricas, top, cut,rfMode);
 			sumP10 += metricas[P10];
 			sumR10 += metricas[R10];
 			sumP20 += metricas[P20];

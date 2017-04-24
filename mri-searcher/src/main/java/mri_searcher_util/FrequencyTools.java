@@ -168,4 +168,25 @@ public class FrequencyTools {
 		}
 		return topTerminos;
 	}
+	
+	public static List<String> obtenerTitulos(IndexReader reader, TopDocs topDocs, int ndr) throws IOException{
+		List<String> relevantes  = new ArrayList<String>();
+		List<String> titulos  = new ArrayList<String>();
+		relevantes = calcularRelevantes(topDocs, reader, ndr);
+		
+		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+			Document doc = reader.document(scoreDoc.doc);
+			String  campoI = doc.getField("I").stringValue().trim();
+			if (relevantes.contains(campoI)){
+				 
+				titulos.add(doc.getField("T").stringValue().trim());
+				if (titulos.size()==ndr) {
+					return titulos;
+				}
+			}
+		}
+		return titulos;
+			
+
+	}
 }
