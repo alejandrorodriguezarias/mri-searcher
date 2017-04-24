@@ -2,6 +2,7 @@ package mri_searcher_util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,14 +50,14 @@ public class FrequencyTools {
 		// Creando la lista de terminos y el iterador
 		Fields fields = MultiFields.getFields(reader);
 		Terms terms = fields.terms(field);
-
+		List<String> queryContentsplit = Arrays.asList(queryContent.split(" "));
 		TermsEnum termsEnum = terms.iterator();
 		String[] topterms = new String[top];
 		double[] topidfs = new double[top];
 
 		while (termsEnum.next() != null) {
 			String nombrestring = termsEnum.term().utf8ToString();
-			if (queryContent.contains(nombrestring)) {
+			if (queryContentsplit.contains(nombrestring)) {
 				// OBTENER IDF
 				int df_T = termsEnum.docFreq();
 				double idf = Math.log(N / df_T);
@@ -159,7 +160,8 @@ public class FrequencyTools {
 			}
 		}
 		Collections.sort(terminosTfIdf);
-		for (int j = 0; j < ndr; j++) {
+		Collections.reverse(terminosTfIdf);
+		for (int j = 0; j < top; j++) {
 			String[] division = terminosTfIdf.get(j).split(",");
 			topTerminos.add(division[1]);
 

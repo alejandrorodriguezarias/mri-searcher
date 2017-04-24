@@ -49,13 +49,16 @@ public class Visualizar {
 			TopDocs expDocs, final String[] fields, float[] metricas, int top, int cut) throws IOException {
 		String queryName = DiccionarioQueries.getContent(query);
 		List<Integer> resultados = new ArrayList<>();
+		List<Integer> expresultados = new ArrayList<>();
 		List<Integer> relevantes = DiccionarioQueries.getRelevants(query);
 
 		// Auxiliares calculo de AP
 		sb.append("Query " + query + ": " + queryName); // PRINT: LA QUERY
 
 		presentarDocumentos(sb, reader, topDocs, fields, resultados, relevantes, top);
-		presentarDocumentos(sb, reader, expDocs, fields, resultados, relevantes, top);
+		
+		sb.append("Query " + query + ": EXPANDIDA"); // PRINT: LA QUERY
+		presentarDocumentos(sb, reader, expDocs, fields, expresultados, relevantes, top);
 
 		// Obtenemos las métricas
 		metricas[P10] = Metricas.Patn(10, resultados, relevantes);

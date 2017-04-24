@@ -100,11 +100,15 @@ public class Searcher {
 					//20 NUM DOCS NECESARIO PARA RECALL20 Y P20
 					
 					topDocs[i] = searcher.search(query, DOCLIMIT);
-					
+					System.err.println("HOLI");
 					List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
+					System.err.println("HOLI2");
 					String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
+					System.err.println("HOLI3");
 					Query expQuery = queryExpandida(queryContent, tfidf, idf);
-					expDocs[i] = searcher.search(expQuery, i);
+					System.err.println("HOLI4" + top);
+					expDocs[i] = searcher.search(expQuery, DOCLIMIT);//xk wea ponia i???
+					System.err.println("HOLI5");
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
@@ -118,10 +122,11 @@ public class Searcher {
 	
 	private Query queryExpandida(String queryContent, List<String> tfidf, String[] idf) throws ParseException {		
 		StringBuilder sb = new StringBuilder();
-		sb.append(queryContent);
-		for(String s : idf) sb.append(s);
-		for(String s : tfidf) sb.append(s);
-		
+		//sb.append(queryContent);
+		for(String s : idf) sb.append(s+ " ");
+		sb.append("\n");
+		for(String s : tfidf) sb.append(s + " ");
+		System.err.println(sb.toString());
 		return queryParser.parse(sb.toString());
 	}
 }
