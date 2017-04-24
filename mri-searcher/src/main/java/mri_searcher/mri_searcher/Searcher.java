@@ -3,6 +3,7 @@ package mri_searcher.mri_searcher;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.lucene.analysis.miscellaneous.LengthFilter;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -17,8 +18,10 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.QueryBuilder;
 
 import mri_searcher_util.DiccionarioQueries;
+import mri_searcher_util.FrequencyTools;
 import mri_searcher_util.Visualizar;
 
 public class Searcher {
@@ -32,6 +35,9 @@ public class Searcher {
 	private String[] fieldsproc;
 	private String[] fieldsvisual;
 	private Similarity suav;
+	
+	private final QueryParser queryParser = new MultiFieldQueryParser(fieldsproc, new StandardAnalyzer());
+
 	
 	public Searcher(Path indexIn, int cut, int top, String queryRange, String[] fieldsproc, String[] fieldvisual, Similarity suav) {
 		this.indexIn = indexIn;
@@ -74,10 +80,10 @@ public class Searcher {
 				) {
 			IndexSearcher searcher = new IndexSearcher(reader);
 			searcher.setSimilarity(suav);
-			QueryParser queryParser = new MultiFieldQueryParser(fieldsproc, new StandardAnalyzer());
 			
 			int[] queryNumbers = rangeParser(queryRange);
 			TopDocs[] topDocs = new TopDocs[queryNumbers.length];
+			TopDocs[] expDocs = new TopDocs[queryNumbers.length];
 			
 			for(int i=0; i<queryNumbers.length; i++) {
 				Query query;
@@ -86,15 +92,31 @@ public class Searcher {
 					query = queryParser.parse(queryContent);
 					//20 NUM DOCS NECESARIO PARA RECALL20 Y P20
 					
-					topDocs[i] = searcher.search(query, cut > 20 ? cut : 20);
+					topDocs[i] = searcher.search(query, 120); // XXX: 120 HARDCODEADO
+					
+					List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, queryContent, "W", topDocs[i], top);
+					String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, "W", top);
+					Query expQuery = queryExpandida(queryContent, tfidf, idf);
+					expDocs[i] = searcher.search(query, i);
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
 				}
 			}
-			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, fieldsvisual,top,cut));
+			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, expDocs, fieldsvisual,top,cut));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}	
+	}
+	
+	private Query queryExpandida(String queryContent, List<String> tfidf, String[] idf) throws ParseException {
+		Query query;
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(queryContent);
+		for(String s : idf) sb.append(s);
+		for(String s : tfidf) sb.append(s);
+		
+		return queryParser.parse(sb.toString());
+	}
 }

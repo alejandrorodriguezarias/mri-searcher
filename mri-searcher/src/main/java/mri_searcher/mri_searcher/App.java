@@ -5,9 +5,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
-import org.apache.lucene.search.similarities.BM25Similarity;
-import org.apache.lucene.search.similarities.LMDirichletSimilarity;
-import org.apache.lucene.search.similarities.LMJelinekMercerSimilarity;
 import org.apache.lucene.search.similarities.Similarity;
 
 import mri_searcher.mri_searcher.CommandLine.MissingArgumentException;
