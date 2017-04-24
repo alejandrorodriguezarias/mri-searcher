@@ -2,10 +2,8 @@ package mri_searcher.mri_searcher;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
-import org.apache.lucene.analysis.miscellaneous.LengthFilter;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
@@ -18,35 +16,44 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.QueryBuilder;
-
 import mri_searcher_util.DiccionarioQueries;
 import mri_searcher_util.FrequencyTools;
 import mri_searcher_util.Visualizar;
 
 public class Searcher {
 
-	private static int MAXQUERY = 225;
+	private final static int MAXQUERY = 225;
+	private final static String BODYFIELD = "W";
+	private final static int DOCLIMIT = 120; // XXX: Valor inventado
 	
-	private Path indexIn;
-	private int cut;
-	private int top;
-	private String queryRange;
-	private String[] fieldsproc;
-	private String[] fieldsvisual;
-	private Similarity suav;
+	private final Path indexIn;
+	private final int cut;
+	private final int top;
+	private final short rfMode;
+	private final int ndr;
+	private final int td;
+	private final int tq;
+	private final String queryRange;
+	private final String[] fieldsproc;
+	private final String[] fieldsvisual;
+	private final Similarity suav;
 	
-	private final QueryParser queryParser = new MultiFieldQueryParser(fieldsproc, new StandardAnalyzer());
+	private final QueryParser queryParser;
 
-	
-	public Searcher(Path indexIn, int cut, int top, String queryRange, String[] fieldsproc, String[] fieldvisual, Similarity suav) {
+	public Searcher(Path indexIn, int cut, int top, short rfMode, int ndr, int td, int tq, String queryRange, String[] fieldsproc, String[] fieldvisual, Similarity suav) {
 		this.indexIn = indexIn;
 		this.cut = cut;
 		this.top = top;
+		this.rfMode = rfMode;
+		this.ndr = ndr;
+		this.td = td;
+		this.tq = tq;
 		this.queryRange = queryRange;
 		this.fieldsproc = fieldsproc;
 		this.fieldsvisual = fieldvisual;
 		this.suav = suav;
+		
+		this.queryParser = new MultiFieldQueryParser(this.fieldsproc, new StandardAnalyzer());
 	}
 
 	private int[] rangeParser(String range) {
@@ -92,12 +99,12 @@ public class Searcher {
 					query = queryParser.parse(queryContent);
 					//20 NUM DOCS NECESARIO PARA RECALL20 Y P20
 					
-					topDocs[i] = searcher.search(query, 120); // XXX: 120 HARDCODEADO
+					topDocs[i] = searcher.search(query, DOCLIMIT);
 					
-					List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, queryContent, "W", topDocs[i], top);
-					String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, "W", top);
+					List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
+					String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
 					Query expQuery = queryExpandida(queryContent, tfidf, idf);
-					expDocs[i] = searcher.search(query, i);
+					expDocs[i] = searcher.search(expQuery, i);
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
@@ -109,9 +116,7 @@ public class Searcher {
 		}
 	}
 	
-	private Query queryExpandida(String queryContent, List<String> tfidf, String[] idf) throws ParseException {
-		Query query;
-		
+	private Query queryExpandida(String queryContent, List<String> tfidf, String[] idf) throws ParseException {		
 		StringBuilder sb = new StringBuilder();
 		sb.append(queryContent);
 		for(String s : idf) sb.append(s);

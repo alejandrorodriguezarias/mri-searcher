@@ -99,7 +99,7 @@ public class FrequencyTools {
 		return relevantes;
 	}
 
-	public static List<String> getBestTermsByTfIdf(IndexReader reader, List<String> queryContent, String field,
+	public static List<String> getBestTermsByTfIdf(IndexReader reader, String field,
 			TopDocs topDocs, int top, int ndr) throws IOException {
 
 		final int N = reader.numDocs();

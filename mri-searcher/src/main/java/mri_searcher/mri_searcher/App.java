@@ -42,6 +42,25 @@ public class App {
 		Path indexin = Paths.get(cl.getOpt("-indexin"));
 		Integer cut = Integer.parseInt(cl.getOpt("-cut"));
 		Integer top = Integer.parseInt(cl.getOpt("-top"));
+		Integer ndr = 0, td = 0, tq = 0;
+		short rfMode = 0;
+		if(cl.hasOpt("-rf1")) {
+			String[] opt = cl.getOpt("-rf1").split(" ");
+			if(opt.length != 3) {
+				System.err.println("Invalid number of arguments for -rf1 option");
+				System.err.println(usage);
+				System.exit(1);
+			}
+			ndr = Integer.parseInt(opt[0]);
+			td = Integer.parseInt(opt[1]);
+			tq = Integer.parseInt(opt[2]);
+			rfMode = 1;
+		}
+		if(cl.hasOpt("-rf2")) {
+			String opt = cl.getOpt("-rf1");
+			ndr = Integer.parseInt(opt);
+			rfMode = 2;
+		}
 		String queries = cl.getOpt("-queries");
 		String[] fieldsproc = cl.getOpt("-fieldsproc").split(",");
 		String[] fieldsvisual = cl.getOpt("-fieldsvisual").split(",");
@@ -51,7 +70,7 @@ public class App {
 		suavizadores = cl.getOpt("-search").split(" ");
 		// Default o número erroneo de parametros
 		suav = Suavizador.seleccionarsuav(suavizadores);
-		Searcher searcher = new Searcher(indexin, cut, top, queries, fieldsproc, fieldsvisual,suav);
+		Searcher searcher = new Searcher(indexin, cut, top, rfMode, ndr, td, tq, queries, fieldsproc, fieldsvisual,suav);
 		searcher.search();
 	}
 
