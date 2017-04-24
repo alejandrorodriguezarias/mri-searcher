@@ -1,8 +1,6 @@
 package mri_searcher_util;
 
 import java.io.IOException;
-import java.util.List;
-
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiFields;
@@ -23,7 +21,7 @@ public class FrequencyTools {
 	 * @return - Un array de String con los términos deseados
 	 * @throws IOException
 	 */
-	public static String[] getBestTermsByIdf(IndexReader reader, List<String> queryContent, String field, int top) throws IOException {
+	public static String[] getBestTermsByIdf(IndexReader reader, String queryContent, String field, int top) throws IOException {
 		int N = reader.numDocs();
 		// Creando la lista de terminos y el iterador
 		Fields fields = MultiFields.getFields(reader);
