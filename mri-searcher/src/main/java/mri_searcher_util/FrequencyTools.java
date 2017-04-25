@@ -3,8 +3,11 @@ package mri_searcher_util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Fields;
@@ -21,6 +24,63 @@ import org.apache.lucene.util.BytesRef;
 public class FrequencyTools {
 
 	private FrequencyTools() {
+	}
+
+	private static double obtenerValorRM1_doc(double queryLikelihood, double lambda, long collectionWordCount, long c,
+			long documentWordCount, int f, int nd) {
+		double prior = 1 / (double) nd;
+		double PwD = (1 - lambda) * (f / documentWordCount) + lambda * (c / collectionWordCount);
+
+		return prior * PwD * Math.pow(queryLikelihood, 10); // XXX: LOGARITMO
+															// NATURAL O
+															// DECIMAL?????
+	}
+
+	public static List<String> obtenerRankingRM1(TopDocs topDocs, IndexReader reader, String field, int nd, int nw) {
+
+		Fields fields = MultiFields.getFields(reader);
+		Terms terms = fields.terms(field);
+		TermsEnum termsEnum = terms.iterator();
+		List<String> terminosRM1 = new ArrayList<String>();
+		List<String> topTerminos = new ArrayList<String>();
+		Map<String, Float> relevantes;
+
+		while (termsEnum.next() != null) {
+
+			// RELEVANTES
+			relevantes = calcularRelevantes(topDocs, reader, nd);
+
+			// OBTENER string campo
+			BytesRef nombre = termsEnum.term();
+			String nombreTermino = nombre.utf8ToString();
+
+			// OBTENER POSTINNGS
+			PostingsEnum lista;
+			lista = termsEnum.postings(null, PostingsEnum.FREQS);
+			double accum = 0.;
+
+			if (lista != null) {
+				int docx;
+				while ((docx = lista.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
+					Document doc = reader.document(docx);
+					String campoI = doc.get("I"); // Numero de documento
+					if (relevantes.containsKey(campoI)) {
+						accum += obtenerValorRM1_doc(new Double(relevantes.get(campoI)), lambda, reader.getSumTotalTermFreq(field),
+								termsEnum.totalTermFreq(), 0, lista.freq(), nd);
+					}
+				}
+			}
+			
+			terminosRM1.add(accum + "," + nombreTermino);
+		}
+		Collections.sort(terminosRM1);
+
+		for (int j = 0; j < nw; j++) {
+			String[] division = terminosRM1.get(j).split(",");
+			topTerminos.add(division[1]);
+
+		}
+		return topTerminos;
 	}
 
 	/**
@@ -83,15 +143,16 @@ public class FrequencyTools {
 		return topterms;
 	}
 
-	public static List<String> calcularRelevantes(TopDocs topDocs, IndexReader reader, int ndr) throws IOException {
+	public static Map<String, Float> calcularRelevantes(TopDocs topDocs, IndexReader reader, int ndr)
+			throws IOException {
 		int i = 0;
-		List<String> relevantes = new ArrayList<String>();
+		Map<String, Float> relevantes = new HashMap<>();
 
 		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 			i++;
 			Document doc = reader.document(scoreDoc.doc);
 			String campoI = doc.get("I").trim();
-			relevantes.add(campoI);
+			relevantes.put(campoI, scoreDoc.score);
 			if (i == ndr) {
 				return relevantes;
 			}
@@ -100,8 +161,8 @@ public class FrequencyTools {
 		return relevantes;
 	}
 
-	public static List<String> getBestTermsByTfIdf(IndexReader reader, String field,
-			TopDocs topDocs, int top, int ndr) throws IOException {
+	public static List<String> getBestTermsByTfIdf(IndexReader reader, String field, TopDocs topDocs, int top, int ndr)
+			throws IOException {
 
 		final int N = reader.numDocs();
 		Fields fields = MultiFields.getFields(reader);
@@ -114,7 +175,7 @@ public class FrequencyTools {
 		while (termsEnum.next() != null) {
 
 			// RELEVANTES
-			relevantes = calcularRelevantes(topDocs, reader, ndr);
+			relevantes = new ArrayList<String>(calcularRelevantes(topDocs, reader, ndr).keySet());
 
 			// OBTENER IDF
 			double idf = obteneridf(termsEnum, N);
@@ -168,24 +229,23 @@ public class FrequencyTools {
 		}
 		return topTerminos;
 	}
-	
-	public static List<String> obtenerTitulos(IndexReader reader, TopDocs topDocs, int ndr) throws IOException{
-		List<String> relevantes  = new ArrayList<String>();
-		List<String> titulos  = new ArrayList<String>();
-		relevantes = calcularRelevantes(topDocs, reader, ndr);
-		
+
+	public static List<String> obtenerTitulos(IndexReader reader, TopDocs topDocs, int ndr) throws IOException {
+		List<String> relevantes = new ArrayList<String>();
+		List<String> titulos = new ArrayList<String>();
+		relevantes = new ArrayList<String>(calcularRelevantes(topDocs, reader, ndr).keySet());
+
 		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 			Document doc = reader.document(scoreDoc.doc);
-			String  campoI = doc.getField("I").stringValue().trim();
-			if (relevantes.contains(campoI)){
+			String campoI = doc.getField("I").stringValue().trim();
+			if (relevantes.contains(campoI)) {
 				titulos.add(doc.getField("T").stringValue().trim());
-				if (titulos.size()==ndr) {
+				if (titulos.size() == ndr) {
 					return titulos;
 				}
 			}
 		}
 		return titulos;
-			
 
 	}
 }
