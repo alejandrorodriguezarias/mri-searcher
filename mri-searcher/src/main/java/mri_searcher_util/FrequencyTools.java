@@ -90,7 +90,7 @@ public class FrequencyTools {
 		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 			i++;
 			Document doc = reader.document(scoreDoc.doc);
-			String campoI = doc.get("I");
+			String campoI = doc.get("I").trim();
 			relevantes.add(campoI);
 			if (i == ndr) {
 				return relevantes;
@@ -178,7 +178,6 @@ public class FrequencyTools {
 			Document doc = reader.document(scoreDoc.doc);
 			String  campoI = doc.getField("I").stringValue().trim();
 			if (relevantes.contains(campoI)){
-				 
 				titulos.add(doc.getField("T").stringValue().trim());
 				if (titulos.size()==ndr) {
 					return titulos;

@@ -104,11 +104,8 @@ public class Searcher {
 						String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
 						expQuery = queryExpandida(queryContent, tfidf, idf);
 					} else if (rfMode==2){
-						System.err.println("HOLA");
 						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
-						System.err.println("HOLA2");
 						expQuery = queryExpandidatitulo(queryContent, titulos);
-						System.err.println("HOLA3");
 					}
 					
 					if (rfMode !=0){
@@ -132,7 +129,6 @@ public class Searcher {
 		for(String s : idf) sb.append(s+ " ");
 		sb.append("\n");
 		for(String s : tfidf) sb.append(s + " ");
-		System.err.println(sb.toString());
 		return queryParser.parse(sb.toString());
 	}
 	
