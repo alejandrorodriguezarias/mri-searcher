@@ -91,6 +91,7 @@ public class Searcher {
 			int[] queryNumbers = rangeParser(queryRange);
 			TopDocs[] topDocs = new TopDocs[queryNumbers.length];
 			TopDocs[] expDocs = new TopDocs[queryNumbers.length];
+			String[] expQueries = new String[queryNumbers.length];
 			
 			for(int i=0; i<queryNumbers.length; i++) {
 				Query query;
@@ -103,25 +104,27 @@ public class Searcher {
 					
 					List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
 					String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
-					Query expQuery = queryExpandida(queryContent, tfidf, idf);
+					String expQueryContent = queryExpandida(queryContent, tfidf, idf);
+					expQueries[i] = expQueryContent;
+					Query expQuery = queryParser.parse(expQueryContent);
 					expDocs[i] = searcher.search(expQuery, i);
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
 				}
 			}
-			System.out.println(Visualizar.visualizar(queryNumbers, reader, topDocs, expDocs, fieldsvisual,top,cut));
+			System.out.println(Visualizar.visualizar(queryNumbers, expQueries, reader, topDocs, expDocs, fieldsvisual,top,cut));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	private Query queryExpandida(String queryContent, List<String> tfidf, String[] idf) throws ParseException {		
+	private String queryExpandida(String queryContent, List<String> tfidf, String[] idf) throws ParseException {		
 		StringBuilder sb = new StringBuilder();
 		sb.append(queryContent);
 		for(String s : idf) sb.append(s);
 		for(String s : tfidf) sb.append(s);
 		
-		return queryParser.parse(sb.toString());
+		return sb.toString();
 	}
 }

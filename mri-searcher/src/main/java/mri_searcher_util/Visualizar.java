@@ -45,7 +45,7 @@ public class Visualizar {
 		}
 	}
 
-	private static void presentarQuery(StringBuilder sb, int query, IndexReader reader, TopDocs topDocs,
+	private static void presentarQuery(StringBuilder sb, int query, String expQuery, IndexReader reader, TopDocs topDocs,
 			TopDocs expDocs, final String[] fields, float[] metricas, int top, int cut) throws IOException {
 		String queryName = DiccionarioQueries.getContent(query);
 		List<Integer> resultados = new ArrayList<>();
@@ -68,13 +68,13 @@ public class Visualizar {
 				+ " Recall@20 " + metricas[R20] + " AveragePrecision " + metricas[AP] + "\n\n");
 	}
 
-	public static final String visualizar(int[] queries, IndexReader reader, TopDocs[] topDocs, TopDocs[] expDocs,
+	public static final String visualizar(int[] queries, String[] expQueries, IndexReader reader, TopDocs[] topDocs, TopDocs[] expDocs,
 			final String[] fields, int top, int cut) throws IOException {
 		float sumP10 = 0f, sumR10 = 0f, sumP20 = 0f, sumR20 = 0f, sumAP = 0f;
 		float[] metricas = new float[5];
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < queries.length; i++) {
-			presentarQuery(sb, queries[i], reader, topDocs[i], expDocs[i], fields, metricas, top, cut);
+			presentarQuery(sb, queries[i], expQueries[i], reader, topDocs[i], expDocs[i], fields, metricas, top, cut);
 			sumP10 += metricas[P10];
 			sumR10 += metricas[R10];
 			sumP20 += metricas[P20];
