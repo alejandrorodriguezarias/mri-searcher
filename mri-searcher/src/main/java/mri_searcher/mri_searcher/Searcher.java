@@ -25,7 +25,7 @@ public class Searcher {
 	private final static int MAXQUERY = 225;
 	private final static String BODYFIELD = "W";
 	private final static int DOCLIMIT = 120; // XXX: Valor inventado
-	
+
 	private final Path indexIn;
 	private final int cut;
 	private final int top;
@@ -37,10 +37,11 @@ public class Searcher {
 	private final String[] fieldsproc;
 	private final String[] fieldsvisual;
 	private final Similarity suav;
-	
+
 	private final QueryParser queryParser;
 
-	public Searcher(Path indexIn, int cut, int top, short rfMode, int ndr, int td, int tq, String queryRange, String[] fieldsproc, String[] fieldvisual, Similarity suav) {
+	public Searcher(Path indexIn, int cut, int top, short rfMode, int ndr, int td, int tq, String queryRange,
+			String[] fieldsproc, String[] fieldvisual, Similarity suav) {
 		this.indexIn = indexIn;
 		this.cut = cut;
 		this.top = top;
@@ -52,7 +53,7 @@ public class Searcher {
 		this.fieldsproc = fieldsproc;
 		this.fieldsvisual = fieldvisual;
 		this.suav = suav;
-		
+
 		this.queryParser = new MultiFieldQueryParser(this.fieldsproc, new StandardAnalyzer());
 	}
 
@@ -60,71 +61,90 @@ public class Searcher {
 		int[] array;
 		int start;
 		int end;
-		if(range.equals("all")) {
+		if (range.equals("all")) {
 			start = 1;
 			end = MAXQUERY;
 		} else {
 			String[] s = range.split("-");
-			if(s.length == 2) {
+			if (s.length == 2) {
 				start = Integer.parseInt(s[0]);
 				end = Integer.parseInt(s[1]);
 			} else {
 				start = end = Integer.parseInt(s[0]);
 			}
 		}
-		array = new int[end-start+1];
+		array = new int[end - start + 1];
 		int j = 0;
-		for(int i=start; i<=end; i++) {
+		for (int i = start; i <= end; i++) {
 			array[j++] = i;
 		}
 		return array;
 	}
 
 	public void search() {
-		try (
-				Directory dirIn = FSDirectory.open(indexIn);
-				IndexReader reader = DirectoryReader.open(dirIn);
-				) {
+		try (Directory dirIn = FSDirectory.open(indexIn); IndexReader reader = DirectoryReader.open(dirIn);) {
 			IndexSearcher searcher = new IndexSearcher(reader);
 			searcher.setSimilarity(suav);
-			
+
 			int[] queryNumbers = rangeParser(queryRange);
 			TopDocs[] topDocs = new TopDocs[queryNumbers.length];
 			TopDocs[] expDocs = new TopDocs[queryNumbers.length];
 			String[] expQueries = new String[queryNumbers.length];
-			
-			for(int i=0; i<queryNumbers.length; i++) {
+
+			for (int i = 0; i < queryNumbers.length; i++) {
 				Query query;
 				String queryContent = DiccionarioQueries.getContent(queryNumbers[i]);
 				try {
 					query = queryParser.parse(queryContent);
-					//20 NUM DOCS NECESARIO PARA RECALL20 Y P20
-					
 					topDocs[i] = searcher.search(query, DOCLIMIT);
-					
-					List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
-					String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
-					String expQueryContent = queryExpandida(queryContent, tfidf, idf);
+					String expQueryContent = null; // Just in case
+					Query expQuery = null;
+
+					if (rfMode == 1) {
+						List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
+						String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
+						expQueryContent = queryExpandida(queryContent, tfidf, idf);
+					} else if (rfMode == 2) {
+						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
+						expQueryContent = queryExpandidatitulo(queryContent, titulos);
+					}
+
 					expQueries[i] = expQueryContent;
-					Query expQuery = queryParser.parse(expQueryContent);
-					expDocs[i] = searcher.search(expQuery, i);
+					expQuery = queryParser.parse(expQueryContent);
+
+					if (rfMode != 0) {
+						expDocs[i] = searcher.search(expQuery, DOCLIMIT);
+					}
+
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
 				}
 			}
-			System.out.println(Visualizar.visualizar(queryNumbers, expQueries, reader, topDocs, expDocs, fieldsvisual,top,cut));
+			System.out.println(Visualizar.visualizar(queryNumbers, expQueries, reader, topDocs, expDocs, fieldsvisual,
+					top, cut, rfMode));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private String queryExpandida(String queryContent, List<String> tfidf, String[] idf) throws ParseException {		
+
+	private String queryExpandida(String queryContent, List<String> tfidf, String[] idf) throws ParseException {
+		StringBuilder sb = new StringBuilder();
+		// sb.append(queryContent);
+		for (String s : idf)
+			sb.append(s + " ");
+		sb.append("\n");
+		for (String s : tfidf)
+			sb.append(s + " ");
+		return sb.toString();
+	}
+
+	private String queryExpandidatitulo(String queryContent, List<String> titulos) throws ParseException {
 		StringBuilder sb = new StringBuilder();
 		sb.append(queryContent);
-		for(String s : idf) sb.append(s);
-		for(String s : tfidf) sb.append(s);
-		
+		for (String s : titulos)
+			sb.append(s + " ");
+		System.err.println(sb.toString());
 		return sb.toString();
 	}
 }

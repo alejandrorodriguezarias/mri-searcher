@@ -2,6 +2,7 @@ package mri_searcher_util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,14 +50,14 @@ public class FrequencyTools {
 		// Creando la lista de terminos y el iterador
 		Fields fields = MultiFields.getFields(reader);
 		Terms terms = fields.terms(field);
-
+		List<String> queryContentsplit = Arrays.asList(queryContent.split(" "));
 		TermsEnum termsEnum = terms.iterator();
 		String[] topterms = new String[top];
 		double[] topidfs = new double[top];
 
 		while (termsEnum.next() != null) {
 			String nombrestring = termsEnum.term().utf8ToString();
-			if (queryContent.contains(nombrestring)) {
+			if (queryContentsplit.contains(nombrestring)) {
 				// OBTENER IDF
 				int df_T = termsEnum.docFreq();
 				double idf = Math.log(N / df_T);
@@ -89,7 +90,7 @@ public class FrequencyTools {
 		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
 			i++;
 			Document doc = reader.document(scoreDoc.doc);
-			String campoI = doc.get("I");
+			String campoI = doc.get("I").trim();
 			relevantes.add(campoI);
 			if (i == ndr) {
 				return relevantes;
@@ -159,11 +160,32 @@ public class FrequencyTools {
 			}
 		}
 		Collections.sort(terminosTfIdf);
-		for (int j = 0; j < ndr; j++) {
+		Collections.reverse(terminosTfIdf);
+		for (int j = 0; j < top; j++) {
 			String[] division = terminosTfIdf.get(j).split(",");
 			topTerminos.add(division[1]);
 
 		}
 		return topTerminos;
+	}
+	
+	public static List<String> obtenerTitulos(IndexReader reader, TopDocs topDocs, int ndr) throws IOException{
+		List<String> relevantes  = new ArrayList<String>();
+		List<String> titulos  = new ArrayList<String>();
+		relevantes = calcularRelevantes(topDocs, reader, ndr);
+		
+		for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+			Document doc = reader.document(scoreDoc.doc);
+			String  campoI = doc.getField("I").stringValue().trim();
+			if (relevantes.contains(campoI)){
+				titulos.add(doc.getField("T").stringValue().trim());
+				if (titulos.size()==ndr) {
+					return titulos;
+				}
+			}
+		}
+		return titulos;
+			
+
 	}
 }

@@ -51,13 +51,13 @@ public class App {
 				System.err.println(usage);
 				System.exit(1);
 			}
-			ndr = Integer.parseInt(opt[0]);
+			ndr = Integer.parseInt(opt[2]);
 			td = Integer.parseInt(opt[1]);
-			tq = Integer.parseInt(opt[2]);
+			tq = Integer.parseInt(opt[0]);
 			rfMode = 1;
 		}
 		if(cl.hasOpt("-rf2")) {
-			String opt = cl.getOpt("-rf1");
+			String opt = cl.getOpt("-rf2");
 			ndr = Integer.parseInt(opt);
 			rfMode = 2;
 		}
