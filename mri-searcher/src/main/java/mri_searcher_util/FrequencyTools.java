@@ -35,8 +35,6 @@ public class FrequencyTools {
 			long documentWordCount, int f, int nd) {
 		double prior = 1 / (double) nd;
 		double PwD = (1 - lambda) * (f / (float) documentWordCount) + lambda * (c / (float) collectionWordCount);
-
-		System.out.println("prior: " + prior + ", PwD: " + PwD + ", result: " + prior * PwD * Math.pow(queryLikelihood, 10));
 		return prior * PwD * Math.pow(queryLikelihood, 10);
 	}
 
@@ -45,9 +43,10 @@ public class FrequencyTools {
 		Analyzer analyzer = new SimpleAnalyzer();
 		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
 		long result = -1;
-		try (IndexReader reader = DirectoryReader.open(ramDir);
-				IndexWriter writer = new IndexWriter(ramDir, iwc)) {
+		try (IndexWriter writer = new IndexWriter(ramDir, iwc)) {
 			writer.addDocument(doc);
+		}
+		try (IndexReader reader = DirectoryReader.open(ramDir)) {
 			result = reader.getSumTotalTermFreq(field);
 		}
 
@@ -82,7 +81,7 @@ public class FrequencyTools {
 				int docx;
 				while ((docx = lista.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
 					Document doc = reader.document(docx);
-					String campoI = doc.get("I"); // Numero de documento
+					String campoI = doc.get("I").trim(); // Numero de documento
 					if (relevantes.containsKey(campoI)) {
 						accum += obtenerValorRM1_doc(new Double(relevantes.get(campoI)), lambda,
 								reader.getSumTotalTermFreq(field), termsEnum.totalTermFreq(), docWordCount(doc, field),
@@ -95,12 +94,10 @@ public class FrequencyTools {
 		}
 		Collections.sort(terminosRM1);
 		Collections.reverse(terminosRM1);
-		
+
 		for (int j = 0; j < nw; j++) {
 			String[] division = terminosRM1.get(j).split(",");
 			topTerminos.add(division[1]);
-			System.err.println("termino: "+ division[1]+ "puntuacion: " + division[0]);
-
 		}
 		return topTerminos;
 	}
