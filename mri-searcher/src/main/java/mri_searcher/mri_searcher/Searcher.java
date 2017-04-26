@@ -39,9 +39,10 @@ public class Searcher {
 	private final Similarity suav;
 
 	private final QueryParser queryParser;
+	private float lambda;
 
 	public Searcher(Path indexIn, int cut, int top, short rfMode, int ndr, int td, int tq, String queryRange,
-			String[] fieldsproc, String[] fieldvisual, Similarity suav) {
+			String[] fieldsproc, String[] fieldvisual, Similarity suav, float lambda) {
 		this.indexIn = indexIn;
 		this.cut = cut;
 		this.top = top;
@@ -53,7 +54,7 @@ public class Searcher {
 		this.fieldsproc = fieldsproc;
 		this.fieldsvisual = fieldvisual;
 		this.suav = suav;
-
+		this.lambda = lambda;
 		this.queryParser = new MultiFieldQueryParser(this.fieldsproc, new StandardAnalyzer());
 	}
 
@@ -97,7 +98,7 @@ public class Searcher {
 				try {
 					query = queryParser.parse(queryContent);
 					topDocs[i] = searcher.search(query, DOCLIMIT);
-					String expQueryContent = null; // Just in case
+					String expQueryContent = null; 
 					Query expQuery = null;
 
 					if (rfMode == 1) {
@@ -107,12 +108,15 @@ public class Searcher {
 					} else if (rfMode == 2) {
 						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
+					} else if (rfMode == 3) {
+						List<String> titulos = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,lambda);
+						expQueryContent = queryExpandidatitulo(queryContent, titulos);
 					}
 
-					expQueries[i] = expQueryContent;
-					expQuery = queryParser.parse(expQueryContent);
-
 					if (rfMode != 0) {
+						
+						expQueries[i] = expQueryContent;
+						expQuery = queryParser.parse(expQueryContent);
 						expDocs[i] = searcher.search(expQuery, DOCLIMIT);
 					}
 
@@ -147,4 +151,5 @@ public class Searcher {
 		System.err.println(sb.toString());
 		return sb.toString();
 	}
+	
 }

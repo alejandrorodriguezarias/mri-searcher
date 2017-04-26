@@ -57,8 +57,9 @@
 	       <argument>T</argument>
 	       <argument>-fieldsvisual</argument>
 	       <argument>T,B</argument>
-	       <argument>-rf2</argument>
-	       <argument>3</argument>
+	       <argument>-prfjm</argument>
+	       <argument>6</argument>
+	       <argument>10</argument>
 	      </arguments>
 	     </configuration>
 	    </execution>

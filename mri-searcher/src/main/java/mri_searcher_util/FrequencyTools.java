@@ -93,10 +93,12 @@ public class FrequencyTools {
 			terminosRM1.add(accum + "," + nombreTermino);
 		}
 		Collections.sort(terminosRM1);
-
+		Collections.reverse(terminosRM1);
+		
 		for (int j = 0; j < nw; j++) {
 			String[] division = terminosRM1.get(j).split(",");
 			topTerminos.add(division[1]);
+			System.err.println("termino: "+ division[1]+ "puntuacion: " + division[0]);
 
 		}
 		return topTerminos;

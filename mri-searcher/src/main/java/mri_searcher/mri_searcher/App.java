@@ -43,6 +43,7 @@ public class App {
 		Integer cut = Integer.parseInt(cl.getOpt("-cut"));
 		Integer top = Integer.parseInt(cl.getOpt("-top"));
 		Integer ndr = 0, td = 0, tq = 0;
+		float lambda = 0;
 		short rfMode = 0;
 		if(cl.hasOpt("-rf1")) {
 			String[] opt = cl.getOpt("-rf1").split(" ");
@@ -61,6 +62,27 @@ public class App {
 			ndr = Integer.parseInt(opt);
 			rfMode = 2;
 		}
+		if(cl.hasOpt("-prfjm")){
+			String[] opt = cl.getOpt("-prfjm").split(" ");
+			if(opt.length != 2) {
+				System.err.println("Invalid number of arguments for -prfjm option");
+				System.err.println(usage);
+				System.exit(1);
+			}
+			if (cl.hasOpt("-search")){
+				String [] suavizadores = cl.getOpt("-search").split(" ");
+				if (suavizadores[0].equals("jm")) {
+					lambda = Float.parseFloat(suavizadores[1]);
+					ndr = Integer.parseInt(opt[0]);
+					td = Integer.parseInt(opt[1]);
+					rfMode = 3;
+				} else {
+						System.err.println("No hay valor de lambda");
+						System.exit(1);
+				}
+			}
+			
+		}
 		String queries = cl.getOpt("-queries");
 		String[] fieldsproc = cl.getOpt("-fieldsproc").split(",");
 		String[] fieldsvisual = cl.getOpt("-fieldsvisual").split(",");
@@ -70,7 +92,7 @@ public class App {
 		suavizadores = cl.getOpt("-search").split(" ");
 		// Default o número erroneo de parametros
 		suav = Suavizador.seleccionarsuav(suavizadores);
-		Searcher searcher = new Searcher(indexin, cut, top, rfMode, ndr, td, tq, queries, fieldsproc, fieldsvisual,suav);
+		Searcher searcher = new Searcher(indexin, cut, top, rfMode, ndr, td, tq, queries, fieldsproc, fieldsvisual,suav,lambda);
 		searcher.search();
 	}
 
