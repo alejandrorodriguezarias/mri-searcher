@@ -34,8 +34,9 @@ public class FrequencyTools {
 	private static double obtenerValorRM1_doc(double queryLikelihood, float lambda, long collectionWordCount, long c,
 			long documentWordCount, int f, int nd) {
 		double prior = 1 / (double) nd;
-		double PwD = (1 - lambda) * (f / documentWordCount) + lambda * (c / collectionWordCount);
+		double PwD = (1 - lambda) * (f / (float) documentWordCount) + lambda * (c / (float) collectionWordCount);
 
+		System.out.println("prior: " + prior + ", PwD: " + PwD + ", result: " + prior * PwD * Math.pow(queryLikelihood, 10));
 		return prior * PwD * Math.pow(queryLikelihood, 10);
 	}
 
