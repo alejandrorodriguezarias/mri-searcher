@@ -3,15 +3,18 @@ package mri_searcher_util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Fields;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.MultiFields;
 import org.apache.lucene.index.PostingsEnum;
 import org.apache.lucene.index.Terms;
@@ -19,6 +22,7 @@ import org.apache.lucene.index.TermsEnum;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.BytesRef;
 
 public class FrequencyTools {
@@ -35,8 +39,17 @@ public class FrequencyTools {
 															// NATURAL O
 															// DECIMAL?????
 	}
+	
+	private static int docWordCount(Document doc) throws IOException {
+		RAMDirectory ramDir = new RAMDirectory();
+		Analyzer analyzer = new SimpleAnalyzer();
+		IndexWriterConfig iwc = new IndexWriterConfig(analyzer);
+		IndexWriter writer = new IndexWriter(ramDir, iwc);
+		
+		return 0;
+	}
 
-	public static List<String> obtenerRankingRM1(TopDocs topDocs, IndexReader reader, String field, int nd, int nw) {
+	public static List<String> obtenerRankingRM1(TopDocs topDocs, IndexReader reader, String field, int nd, int nw, double lambda) throws IOException {
 
 		Fields fields = MultiFields.getFields(reader);
 		Terms terms = fields.terms(field);
@@ -53,7 +66,7 @@ public class FrequencyTools {
 			// OBTENER string campo
 			BytesRef nombre = termsEnum.term();
 			String nombreTermino = nombre.utf8ToString();
-
+			
 			// OBTENER POSTINNGS
 			PostingsEnum lista;
 			lista = termsEnum.postings(null, PostingsEnum.FREQS);
@@ -66,7 +79,7 @@ public class FrequencyTools {
 					String campoI = doc.get("I"); // Numero de documento
 					if (relevantes.containsKey(campoI)) {
 						accum += obtenerValorRM1_doc(new Double(relevantes.get(campoI)), lambda, reader.getSumTotalTermFreq(field),
-								termsEnum.totalTermFreq(), 0, lista.freq(), nd);
+								termsEnum.totalTermFreq(), docWordCount(doc), lista.freq(), nd);
 					}
 				}
 			}
