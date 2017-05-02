@@ -46,7 +46,7 @@ public class Visualizar {
 	}
 
 	private static void presentarQuery(StringBuilder sb, int query, String expQuery, IndexReader reader, TopDocs topDocs,
-			TopDocs expDocs, final String[] fields, float[] metricas, int top, int cut, int rfMode) throws IOException {
+			TopDocs expDocs, final String[] fields, float[] metricas, float[] expmetricas, int top, int cut, int rfMode) throws IOException {
 		String queryName = DiccionarioQueries.getContent(query);
 		List<Integer> resultados = new ArrayList<>();
 		List<Integer> expresultados = new ArrayList<>();
@@ -56,10 +56,6 @@ public class Visualizar {
 		sb.append("Query " + query + ": " + queryName); // PRINT: LA QUERY
 
 		presentarDocumentos(sb, reader, topDocs, fields, resultados, relevantes, top);
-		if (rfMode !=0) {
-			sb.append("Query " + query + ": " + expQuery); // PRINT: LA QUERY
-			presentarDocumentos(sb, reader, expDocs, fields, expresultados, relevantes, top);
-		}
 
 		// Obtenemos las métricas
 		metricas[P10] = Metricas.Patn(10, resultados, relevantes);
@@ -70,20 +66,45 @@ public class Visualizar {
 
 		sb.append("Métricas: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20]
 				+ " Recall@20 " + metricas[R20] + " AveragePrecision " + metricas[AP] + "\n\n");
+
+	
+		if (rfMode !=0) {
+			sb.append("Query " + query + ": " + expQuery); // PRINT: LA QUERY
+			presentarDocumentos(sb, reader, expDocs, fields, expresultados, relevantes, top);
+			// Obtenemos las métricas de la query expandida
+			metricas[P10] = Metricas.Patn(10, expresultados, relevantes);
+			metricas[R10] = Metricas.Recallatn(10, expresultados, relevantes);
+			metricas[P20] = Metricas.Patn(20, expresultados, relevantes);
+			metricas[R20] = Metricas.Recallatn(20, expresultados, relevantes);
+			metricas[AP] = Metricas.AveragePrecision(expresultados, relevantes, cut);
+
+			sb.append("Métricas Q. Expandida: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20]
+					+ " Recall@20 " + metricas[R20] + " AveragePrecision " + metricas[AP] + "\n\n");
+		}
 	}
+
 
 	public static final String visualizar(int[] queries, String[] expQueries, IndexReader reader, TopDocs[] topDocs, TopDocs[] expDocs,
 			final String[] fields, int top, int cut, int rfMode) throws IOException {
 		float sumP10 = 0f, sumR10 = 0f, sumP20 = 0f, sumR20 = 0f, sumAP = 0f;
-		float[] metricas = new float[5];
+		float expSumP10 = 0f, expSumR10 = 0f, expSumP20 = 0f, expSumR20 = 0f, expSumAP = 0f;
+		float[] metricas = new float[5], expmetricas = new float[5];
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < queries.length; i++) {
-			presentarQuery(sb, queries[i], expQueries[i], reader, topDocs[i], expDocs[i], fields, metricas, top, cut,rfMode);
+			presentarQuery(sb, queries[i], expQueries[i], reader, topDocs[i], expDocs[i], fields, metricas, expmetricas, top, cut,rfMode);
 			sumP10 += metricas[P10];
 			sumR10 += metricas[R10];
 			sumP20 += metricas[P20];
 			sumR20 += metricas[R20];
 			sumAP += metricas[AP];
+			
+			if(rfMode != 0) {
+				expSumP10 += expmetricas[P10];
+				expSumR10 += expmetricas[R10];
+				expSumP20 += expmetricas[P20];
+				expSumR20 += expmetricas[R20];
+				expSumAP += expmetricas[AP];
+			}
 		}
 
 		sb.append("Promedio métricas: ");
@@ -92,6 +113,15 @@ public class Visualizar {
 		sb.append("P@20 " + sumP20 / queries.length + " ");
 		sb.append("Recall@20 " + sumR20 / queries.length + " ");
 		sb.append("MAP " + sumAP / queries.length + " ");
+		
+		if(rfMode != 0) {
+			sb.append("Promedio métricas: ");
+			sb.append("P@10 " + expSumP10 / queries.length + " ");
+			sb.append("Recall@10 " + expSumR10 / queries.length + " ");
+			sb.append("P@20 " + expSumP20 / queries.length + " ");
+			sb.append("Recall@20 " + expSumR20 / queries.length + " ");
+			sb.append("MAP " + expSumAP / queries.length + " ");
+		}
 
 		return sb.toString();
 	}
