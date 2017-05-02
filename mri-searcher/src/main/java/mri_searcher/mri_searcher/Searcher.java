@@ -112,8 +112,11 @@ public class Searcher {
 						List<String> titulos = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,lambda,false);
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
 					} else if (rfMode == 4) {
+						System.err.println("LOLAS1");
 						List<String> titulos = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,lambda,true);
+						System.err.println("LOLAS2");
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
+						System.err.println("LOLAS3");
 					}
 
 					if (rfMode != 0) {

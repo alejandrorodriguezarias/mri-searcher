@@ -42,6 +42,7 @@ public class App {
 		Path indexin = Paths.get(cl.getOpt("-indexin"));
 		Integer cut = Integer.parseInt(cl.getOpt("-cut"));
 		Integer top = Integer.parseInt(cl.getOpt("-top"));
+		System.err.println("LOLAS6");
 		Integer ndr = 0, td = 0, tq = 0;
 		float suavizado = 0;
 		short rfMode = 0;
@@ -63,7 +64,11 @@ public class App {
 			rfMode = 2;
 		}
 		if(cl.hasOpt("-prfjm") || cl.hasOpt("-prfdir")){
-			String[] opt = cl.getOpt("-prfjm").split(" ");
+			String[] opt = cl.hasOpt("-prfjm") ? cl.getOpt("-prfjm").split(" ") : cl.getOpt("-prfdir").split(" ");
+			System.err.println("LOLAS7");
+			rfMode = (short) (cl.hasOpt("-prfjm") ? 3 : 4);
+			System.err.println("LOLAS5");
+			System.err.println(rfMode);
 			if(opt.length != 2) {
 				System.err.println("Invalid number of arguments for -prf[jm|dir] option");
 				System.err.println(usage);
@@ -71,11 +76,10 @@ public class App {
 			}
 			if (cl.hasOpt("-search")){
 				String [] suavizadores = cl.getOpt("-search").split(" ");
-				if (suavizadores[0].equals("jm")) {
+				if ((suavizadores[0].equals("jm"))|| (suavizadores[0].equals("dir"))) {
 					suavizado = Float.parseFloat(suavizadores[1]);
 					ndr = Integer.parseInt(opt[0]);
 					td = Integer.parseInt(opt[1]);
-					rfMode = (short) (cl.hasOpt("-prfjm") ? 3 : 4);
 				} else {
 						System.err.println("No se ha seleccionado valor para el parámetro de suavizado");
 						System.exit(1);
