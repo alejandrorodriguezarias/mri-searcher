@@ -72,11 +72,11 @@ public class Visualizar {
 			sb.append("Query " + query + ": " + expQuery); // PRINT: LA QUERY
 			presentarDocumentos(sb, reader, expDocs, fields, expresultados, relevantes, top);
 			// Obtenemos las métricas de la query expandida
-			metricas[P10] = Metricas.Patn(10, expresultados, relevantes);
-			metricas[R10] = Metricas.Recallatn(10, expresultados, relevantes);
-			metricas[P20] = Metricas.Patn(20, expresultados, relevantes);
-			metricas[R20] = Metricas.Recallatn(20, expresultados, relevantes);
-			metricas[AP] = Metricas.AveragePrecision(expresultados, relevantes, cut);
+			expmetricas[P10] = Metricas.Patn(10, expresultados, relevantes);
+			expmetricas[R10] = Metricas.Recallatn(10, expresultados, relevantes);
+			expmetricas[P20] = Metricas.Patn(20, expresultados, relevantes);
+			expmetricas[R20] = Metricas.Recallatn(20, expresultados, relevantes);
+			expmetricas[AP] = Metricas.AveragePrecision(expresultados, relevantes, cut);
 
 			sb.append("Métricas Q. Expandida: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20]
 					+ " Recall@20 " + metricas[R20] + " AveragePrecision " + metricas[AP] + "\n\n");
@@ -112,10 +112,10 @@ public class Visualizar {
 		sb.append("Recall@10 " + sumR10 / queries.length + " ");
 		sb.append("P@20 " + sumP20 / queries.length + " ");
 		sb.append("Recall@20 " + sumR20 / queries.length + " ");
-		sb.append("MAP " + sumAP / queries.length + " ");
+		sb.append("MAP " + sumAP / queries.length + "\n");
 		
 		if(rfMode != 0) {
-			sb.append("Promedio métricas: ");
+			sb.append("Promedio métricas expandida: ");
 			sb.append("P@10 " + expSumP10 / queries.length + " ");
 			sb.append("Recall@10 " + expSumR10 / queries.length + " ");
 			sb.append("P@20 " + expSumP20 / queries.length + " ");
