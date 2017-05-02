@@ -31,11 +31,24 @@ public class FrequencyTools {
 	private FrequencyTools() {
 	}
 
-	private static double obtenerValorRM1_doc(double queryLikelihood, float lambda, long collectionWordCount, long c,
+	private static double obtenerValorRM1_jm(double queryLikelihood, float lambda, long collectionWordCount, long c,
 			long documentWordCount, int f, int nd) {
 		double prior = 1 / (double) nd;
 		double PwD = (1 - lambda) * (f / (float) documentWordCount) + lambda * (c / (float) collectionWordCount);
 		return prior * PwD * Math.pow(queryLikelihood, 10);
+	}
+
+	private static double obtenerValorRM1_dir(double queryLikelihood, float mu, long collectionWordCount, long c,
+			long documentWordCount, int f, int nd) {
+		double prior = 1 / (double) nd;
+		double PwD = (f+mu*(c/collectionWordCount)) / (documentWordCount+mu);
+		return prior * PwD * Math.pow(queryLikelihood, 10);
+	}
+	
+	@FunctionalInterface
+	private interface FuncionSuavizado {
+		abstract double call(double queryLikelihood, float paramSuav, long collectionWordCount, long c,
+			long documentWordCount, int f, int nd);
 	}
 
 	private static long docWordCount(Document doc, String field) throws IOException {
@@ -54,7 +67,7 @@ public class FrequencyTools {
 	}
 
 	public static List<String> obtenerRankingRM1(TopDocs topDocs, IndexReader reader, String field, int nd, int nw,
-			float lambda) throws IOException {
+			float paramSuavizado, boolean dir) throws IOException {
 
 		Fields fields = MultiFields.getFields(reader);
 		Terms terms = fields.terms(field);
@@ -62,6 +75,7 @@ public class FrequencyTools {
 		List<String> terminosRM1 = new ArrayList<String>();
 		List<String> topTerminos = new ArrayList<String>();
 		Map<String, Float> relevantes;
+		FuncionSuavizado fun = dir ? FrequencyTools::obtenerValorRM1_dir : FrequencyTools::obtenerValorRM1_jm;
 
 		while (termsEnum.next() != null) {
 
@@ -83,9 +97,9 @@ public class FrequencyTools {
 					Document doc = reader.document(docx);
 					String campoI = doc.get("I").trim(); // Numero de documento
 					if (relevantes.containsKey(campoI)) {
-						accum += obtenerValorRM1_doc(new Double(relevantes.get(campoI)), lambda,
-								reader.getSumTotalTermFreq(field), termsEnum.totalTermFreq(), docWordCount(doc, field),
-								lista.freq(), nd);
+						accum += fun.call(new Double(relevantes.get(campoI)), paramSuavizado,
+									reader.getSumTotalTermFreq(field), termsEnum.totalTermFreq(), docWordCount(doc, field),
+									lista.freq(), nd);
 					}
 				}
 			}

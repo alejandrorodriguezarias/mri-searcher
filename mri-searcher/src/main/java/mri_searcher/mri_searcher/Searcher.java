@@ -109,7 +109,10 @@ public class Searcher {
 						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
 					} else if (rfMode == 3) {
-						List<String> titulos = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,lambda);
+						List<String> titulos = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,lambda,false);
+						expQueryContent = queryExpandidatitulo(queryContent, titulos);
+					} else if (rfMode == 4) {
+						List<String> titulos = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,lambda,true);
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
 					}
 
