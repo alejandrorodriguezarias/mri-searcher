@@ -31,6 +31,8 @@ class CommandLine {
 			sb.deleteCharAt(sb.length()-1); // remove trailing whitespace
 			opts.put(current, sb.toString()); // add to dict
 			sb.setLength(0); // reset length
+		} else {
+			opts.put(current, "");
 		}
 	}
 
