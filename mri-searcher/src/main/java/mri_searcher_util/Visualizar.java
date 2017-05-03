@@ -53,6 +53,7 @@ public class Visualizar {
 		List<Integer> relevantes = DiccionarioQueries.getRelevants(query);
 
 		// Auxiliares calculo de AP
+		sb.append("******************************************************************\n");
 		sb.append("Query " + query + ": " + queryName); // PRINT: LA QUERY
 
 		presentarDocumentos(sb, reader, topDocs, fields, resultados, relevantes, top);
@@ -64,12 +65,12 @@ public class Visualizar {
 		metricas[R20] = Metricas.Recallatn(20, resultados, relevantes);
 		metricas[AP] = Metricas.AveragePrecision(resultados, relevantes, cut);
 
-		sb.append("Métricas: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20]
+		sb.append("\nMétricas: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20]
 				+ " Recall@20 " + metricas[R20] + " AveragePrecision " + metricas[AP] + "\n\n");
 
 	
 		if (rfMode !=0) {
-			sb.append("Query " + query + ": " + expQuery); // PRINT: LA QUERY
+			sb.append("Query " + query + " expandida : " + expQuery); // PRINT: LA QUERY
 			presentarDocumentos(sb, reader, expDocs, fields, expresultados, relevantes, top);
 			// Obtenemos las métricas de la query expandida
 			expmetricas[P10] = Metricas.Patn(10, expresultados, relevantes);
@@ -78,7 +79,7 @@ public class Visualizar {
 			expmetricas[R20] = Metricas.Recallatn(20, expresultados, relevantes);
 			expmetricas[AP] = Metricas.AveragePrecision(expresultados, relevantes, cut);
 
-			sb.append("Métricas Q. Expandida: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20]
+			sb.append("\nMétricas Q. Expandida: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20]
 					+ " Recall@20 " + metricas[R20] + " AveragePrecision " + metricas[AP] + "\n\n");
 		}
 	}
