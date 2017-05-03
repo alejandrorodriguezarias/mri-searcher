@@ -115,7 +115,6 @@ public class Searcher {
 					Query expQuery = null;
 
 					if (rfMode == 1) {
-						System.err.println(explain);
 						List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
 						queryTerms = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq, idfsQuery);
 						for(int j = 0; j<td;j++) {
@@ -124,9 +123,7 @@ public class Searcher {
 							tfsDoc.add(split[2]);
 							idfsDoc.add(split[3]);
 						}
-						System.err.println("LOLAS4");
 						expQueryContent = queryExpandida(queryContent, termsTfidf, queryTerms);
-						System.err.println("LOLAS5");
 					} else if (rfMode == 2) {
 						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
@@ -151,9 +148,7 @@ public class Searcher {
 				
 				if(explain) {
 					if(rfMode == 1){
-						System.err.println("ERROR1");
 						System.out.println(Visualizar.explain_rf1(queryNumbers[i], termsTfidf, tfsDoc, idfsDoc, queryTerms, idfsQuery));
-						System.err.println("ERROR2");
 					}
 					if(rfMode == 3 || rfMode == 4)
 						System.out.println(Visualizar.explain_prf(queryNumbers[i], termsRM1, valuesRM1));

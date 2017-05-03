@@ -87,12 +87,6 @@ public class App {
 		String[] fieldsproc = cl.getOpt("-fieldsproc").split(",");
 		String[] fieldsvisual = cl.getOpt("-fieldsvisual").split(",");
 		boolean explain = cl.hasOpt("-explain");
-		if (cl.hasOpt("-explain")){
-			System.err.println("YOYA...");
-		}else {
-			System.err.println("flipando");
-		}
-		System.err.println(explain);
 		// INDEXINGMODEL
 		String[] suavizadores = null;
 		Similarity suav = null;

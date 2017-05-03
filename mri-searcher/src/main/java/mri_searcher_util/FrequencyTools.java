@@ -81,6 +81,7 @@ public class FrequencyTools {
 						double collectionWordCount = reader.getSumTotalTermFreq(field);
 						double f = lista.freq();
 						double documentWordCount = docWordCount(doc, field);
+						System.err.println(documentWordCount);
 						double PwD;
 						if(dir) {
 							PwD = (f+paramSuavizado*(c/collectionWordCount)) / (documentWordCount+paramSuavizado);
@@ -133,9 +134,7 @@ public class FrequencyTools {
 		// Creando la lista de terminos y el iterador
 		Fields fields = MultiFields.getFields(reader);
 		Terms terms = fields.terms(field);
-		System.err.println("LOLAS10");
 		List<String> queryContentsplit = Arrays.asList(queryContent.split(" "));
-		System.err.println("LOLAS11");
 		TermsEnum termsEnum = terms.iterator();
 		String[] topterms = new String[top];
 
@@ -244,7 +243,7 @@ public class FrequencyTools {
 			}
 		}
 		Collections.sort(terminosTfIdf);
-		//Collections.reverse(terminosTfIdf);
+		Collections.reverse(terminosTfIdf);
 
 		return terminosTfIdf;
 	}
