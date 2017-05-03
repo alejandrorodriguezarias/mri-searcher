@@ -86,13 +86,14 @@ public class App {
 		String queries = cl.getOpt("-queries");
 		String[] fieldsproc = cl.getOpt("-fieldsproc").split(",");
 		String[] fieldsvisual = cl.getOpt("-fieldsvisual").split(",");
+		boolean explain = cl.hasOpt("-explain");
 		// INDEXINGMODEL
 		String[] suavizadores = null;
 		Similarity suav = null;
 		suavizadores = cl.getOpt("-search").split(" ");
 		// Default o número erroneo de parametros
 		suav = Suavizador.seleccionarsuav(suavizadores);
-		Searcher searcher = new Searcher(indexin, cut, top, rfMode, ndr, td, tq, queries, fieldsproc, fieldsvisual,suav,suavizado);
+		Searcher searcher = new Searcher(indexin, cut, top, rfMode, ndr, td, tq, queries, fieldsproc, fieldsvisual,suav,suavizado,explain);
 		searcher.search();
 	}
 
@@ -129,7 +130,6 @@ public class App {
 				indXr.index();
 			} catch (IOException e) {
 				System.err.println("Falló la indexación :^(");
-
 			}
 		}
 	}

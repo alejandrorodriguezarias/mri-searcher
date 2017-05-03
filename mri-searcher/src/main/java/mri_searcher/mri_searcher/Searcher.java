@@ -2,6 +2,7 @@ package mri_searcher.mri_searcher;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -37,12 +38,12 @@ public class Searcher {
 	private final String[] fieldsproc;
 	private final String[] fieldsvisual;
 	private final Similarity suav;
-
+	private final boolean explain;
 	private final QueryParser queryParser;
-	private float lambda;
+	private final float paramSuavizado;
 
 	public Searcher(Path indexIn, int cut, int top, short rfMode, int ndr, int td, int tq, String queryRange,
-			String[] fieldsproc, String[] fieldvisual, Similarity suav, float lambda) {
+			String[] fieldsproc, String[] fieldvisual, Similarity suav, float paramSuavizado, boolean explain) {
 		this.indexIn = indexIn;
 		this.cut = cut;
 		this.top = top;
@@ -54,8 +55,9 @@ public class Searcher {
 		this.fieldsproc = fieldsproc;
 		this.fieldsvisual = fieldvisual;
 		this.suav = suav;
-		this.lambda = lambda;
+		this.paramSuavizado = paramSuavizado;
 		this.queryParser = new MultiFieldQueryParser(this.fieldsproc, new StandardAnalyzer());
+		this.explain = explain;
 	}
 
 	private int[] rangeParser(String range) {
@@ -92,9 +94,20 @@ public class Searcher {
 			TopDocs[] expDocs = new TopDocs[queryNumbers.length];
 			String[] expQueries = new String[queryNumbers.length];
 
+
 			for (int i = 0; i < queryNumbers.length; i++) {
 				Query query;
 				String queryContent = DiccionarioQueries.getContent(queryNumbers[i]);
+				
+				// para el explain
+				List<String> termsTfidf = new ArrayList<>();
+				List<String> tfsDoc = new ArrayList<>();
+				List<String> idfsDoc = new ArrayList<>();
+				Double[] idfsQuery = new Double[tq];
+				String[] queryTerms = null;
+				List<String> termsRM1 = null;
+				List<String> valuesRM1 = null;
+				
 				try {
 					query = queryParser.parse(queryContent);
 					topDocs[i] = searcher.search(query, DOCLIMIT);
@@ -103,21 +116,26 @@ public class Searcher {
 
 					if (rfMode == 1) {
 						List<String> tfidf = FrequencyTools.getBestTermsByTfIdf(reader, BODYFIELD, topDocs[i], td, ndr);
-						String[] idf = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq);
-						expQueryContent = queryExpandida(queryContent, tfidf, idf);
+						queryTerms = FrequencyTools.getBestTermsByIdf(reader, queryContent, BODYFIELD, tq, idfsQuery);
+						for(String s : tfidf) {
+							String[] split = s.split(",");
+							termsTfidf.add(split[1]);
+							tfsDoc.add(split[2]);
+							idfsDoc.add(split[3]);
+						}
+						expQueryContent = queryExpandida(queryContent, termsTfidf, queryTerms);
 					} else if (rfMode == 2) {
 						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
 					} else if (rfMode == 3) {
-						List<String> titulos = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,lambda,false);
-						expQueryContent = queryExpandidatitulo(queryContent, titulos);
+						termsRM1 = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,paramSuavizado,false,valuesRM1);
+						expQueryContent = queryExpandidatitulo(queryContent, termsRM1);
 					} else if (rfMode == 4) {
-						List<String> titulos = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,lambda,true);
-						expQueryContent = queryExpandidatitulo(queryContent, titulos);
+						termsRM1 = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,paramSuavizado,true,valuesRM1);
+						expQueryContent = queryExpandidatitulo(queryContent, termsRM1);
 					}
 
 					if (rfMode != 0) {
-						
 						expQueries[i] = expQueryContent;
 						expQuery = queryParser.parse(expQueryContent);
 						expDocs[i] = searcher.search(expQuery, DOCLIMIT);
@@ -126,6 +144,13 @@ public class Searcher {
 				} catch (ParseException e) {
 					System.err.println("No se pudo parsear la query " + queryContent);
 					e.printStackTrace();
+				}
+				
+				if(explain) {
+					if(rfMode == 1)
+						System.out.println(Visualizar.explain_rf1(i, termsTfidf, tfsDoc, idfsDoc, queryTerms, idfsQuery));
+					if(rfMode == 3 || rfMode == 4)
+						System.out.println(Visualizar.explain_prf(i, termsRM1, valuesRM1));
 				}
 			}
 			System.out.println(Visualizar.visualizar(queryNumbers, expQueries, reader, topDocs, expDocs, fieldsvisual,

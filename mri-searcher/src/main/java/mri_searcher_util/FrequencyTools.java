@@ -31,26 +31,6 @@ public class FrequencyTools {
 	private FrequencyTools() {
 	}
 
-	private static double obtenerValorRM1_jm(double queryLikelihood, float lambda, long collectionWordCount, long c,
-			long documentWordCount, int f, int nd) {
-		double prior = 1 / (double) nd;
-		double PwD = (1 - lambda) * (f / (float) documentWordCount) + lambda * (c / (float) collectionWordCount);
-		return prior * PwD * Math.pow(queryLikelihood, 10);
-	}
-
-	private static double obtenerValorRM1_dir(double queryLikelihood, float mu, long collectionWordCount, long c,
-			long documentWordCount, int f, int nd) {
-		double prior = 1 / (double) nd;
-		double PwD = (f+mu*(c/collectionWordCount)) / (documentWordCount+mu);
-		return prior * PwD * Math.pow(queryLikelihood, 10);
-	}
-	
-	@FunctionalInterface
-	private interface FuncionSuavizado {
-		abstract double call(double queryLikelihood, float paramSuav, long collectionWordCount, long c,
-			long documentWordCount, int f, int nd);
-	}
-
 	private static long docWordCount(Document doc, String field) throws IOException {
 		RAMDirectory ramDir = new RAMDirectory();
 		Analyzer analyzer = new SimpleAnalyzer();
@@ -67,7 +47,7 @@ public class FrequencyTools {
 	}
 
 	public static List<String> obtenerRankingRM1(TopDocs topDocs, IndexReader reader, String field, int nd, int nw,
-			float paramSuavizado, boolean dir) throws IOException {
+			float paramSuavizado, boolean dir, List<String> explain) throws IOException {
 
 		Fields fields = MultiFields.getFields(reader);
 		Terms terms = fields.terms(field);
@@ -75,7 +55,6 @@ public class FrequencyTools {
 		List<String> terminosRM1 = new ArrayList<String>();
 		List<String> topTerminos = new ArrayList<String>();
 		Map<String, Float> relevantes;
-		FuncionSuavizado fun = dir ? FrequencyTools::obtenerValorRM1_dir : FrequencyTools::obtenerValorRM1_jm;
 
 		while (termsEnum.next() != null) {
 
@@ -97,9 +76,20 @@ public class FrequencyTools {
 					Document doc = reader.document(docx);
 					String campoI = doc.get("I").trim(); // Numero de documento
 					if (relevantes.containsKey(campoI)) {
-						accum += fun.call(new Double(relevantes.get(campoI)), paramSuavizado,
-									reader.getSumTotalTermFreq(field), termsEnum.totalTermFreq(), docWordCount(doc, field),
-									lista.freq(), nd);
+						double prior = 1 / (double) nd;
+						double c = termsEnum.totalTermFreq();
+						double collectionWordCount = reader.getSumTotalTermFreq(field);
+						double f = lista.freq();
+						double documentWordCount = docWordCount(doc, field);
+						double PwD;
+						if(dir) {
+							PwD = (f+paramSuavizado*(c/collectionWordCount)) / (documentWordCount+paramSuavizado);
+						} else {
+							PwD = (1 - paramSuavizado) * (f / (float) documentWordCount) + paramSuavizado * (c / (float) collectionWordCount);
+						}
+						double queryLikelihood = new Double(relevantes.get(campoI));
+						accum += prior * PwD * Math.pow(queryLikelihood, 10);
+						explain.add(prior + "," + PwD + "," + queryLikelihood);
 					}
 				}
 			}
@@ -137,7 +127,7 @@ public class FrequencyTools {
 		return Math.log(N / df_T);
 	}
 
-	public static String[] getBestTermsByIdf(IndexReader reader, String queryContent, String field, int top)
+	public static String[] getBestTermsByIdf(IndexReader reader, String queryContent, String field, int top, Double[] topidfs)
 			throws IOException {
 		int N = reader.numDocs();
 		// Creando la lista de terminos y el iterador
@@ -146,7 +136,6 @@ public class FrequencyTools {
 		List<String> queryContentsplit = Arrays.asList(queryContent.split(" "));
 		TermsEnum termsEnum = terms.iterator();
 		String[] topterms = new String[top];
-		double[] topidfs = new double[top];
 
 		while (termsEnum.next() != null) {
 			String nombrestring = termsEnum.term().utf8ToString();
@@ -202,7 +191,6 @@ public class FrequencyTools {
 		Terms terms = fields.terms(field);
 		TermsEnum termsEnum = terms.iterator();
 		List<String> terminosTfIdf = new ArrayList<String>();
-		List<String> topTerminos = new ArrayList<String>();
 		List<String> relevantes = new ArrayList<String>();
 
 		while (termsEnum.next() != null) {
@@ -247,7 +235,7 @@ public class FrequencyTools {
 						 * ", termino: " + nombrestring + " )" + " tf: " +
 						 * tf_docOrigen + " idf: " + idf;
 						 */
-						termino = tfidf + "," + nombrestring;
+						termino = tfidf + "," + nombrestring + "," + tf_doc + "," + idf;
 						terminosTfIdf.add(termino);
 					}
 				}
@@ -255,12 +243,8 @@ public class FrequencyTools {
 		}
 		Collections.sort(terminosTfIdf);
 		Collections.reverse(terminosTfIdf);
-		for (int j = 0; j < top; j++) {
-			String[] division = terminosTfIdf.get(j).split(",");
-			topTerminos.add(division[1]);
 
-		}
-		return topTerminos;
+		return terminosTfIdf;
 	}
 
 	public static List<String> obtenerTitulos(IndexReader reader, TopDocs topDocs, int ndr) throws IOException {

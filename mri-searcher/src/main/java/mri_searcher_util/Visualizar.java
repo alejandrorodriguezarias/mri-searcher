@@ -126,4 +126,36 @@ public class Visualizar {
 
 		return sb.toString();
 	}
+	
+	public static final String explain_rf1(int query, List<String> docTerms, List<String> idfsDoc, List<String> tfsDoc, String[] queryTerms, Double[] idfsQuery) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Query " + query + ": " + DiccionarioQueries.getContent(query) + "\n");
+		sb.append("Se expande con:\n");
+		
+		sb.append("\nTérminos extraídos de la query\n");
+		for(int i=0; i<queryTerms.length; i++) {
+			sb.append("Término: " + queryTerms[i] + " idf: " + idfsQuery[i] + "\n");
+		}
+		
+		sb.append("\nTérminos extraídos de documentos relevantes\n");
+		for(int i=0; i<docTerms.size(); i++) {
+			sb.append("Término: " + docTerms.get(i) + " idf: " + idfsDoc.get(i) + " tf: " + tfsDoc.get(i) + "\n");
+		}
+		
+		return sb.toString();
+	}
+	
+	public static final String explain_prf(int query, List<String> terms, List<String> valor) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Query " + query + ": " + DiccionarioQueries.getContent(query) + "\n");
+		sb.append("Se expande con:\n");
+		
+		sb.append("\nTérminos obtenidos mediante RM1\n");
+		for(int i=0; i<terms.size(); i++) {
+			String[] split = valor.get(i).split(",");
+			sb.append("Término: " + terms.get(i) + " P(D): " + split[0] + " P(w|D): " + split[1] + " Query likelihood: " + split[2] + "\n");
+		}
+		
+		return sb.toString();
+	}
 }
