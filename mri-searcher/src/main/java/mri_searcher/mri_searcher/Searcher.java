@@ -128,9 +128,11 @@ public class Searcher {
 						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
 					} else if (rfMode == 3) {
+						valuesRM1 = new ArrayList<String>();
 						termsRM1 = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,paramSuavizado,false,valuesRM1);
 						expQueryContent = queryExpandidatitulo(queryContent, termsRM1);
 					} else if (rfMode == 4) {
+						valuesRM1 = new ArrayList<String>();
 						termsRM1 = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,paramSuavizado,true,valuesRM1);
 						expQueryContent = queryExpandidatitulo(queryContent, termsRM1);
 					}
@@ -166,7 +168,7 @@ public class Searcher {
 		// sb.append(queryContent);
 		for (String s : idf)
 			sb.append(s + " ");
-		sb.append("\n");
+		//sb.append("\n");
 		for (String s : tfidf)
 			sb.append(s + " ");
 		return sb.toString();

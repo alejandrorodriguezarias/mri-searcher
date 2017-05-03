@@ -81,7 +81,6 @@ public class FrequencyTools {
 						double collectionWordCount = reader.getSumTotalTermFreq(field);
 						double f = lista.freq();
 						double documentWordCount = docWordCount(doc, field);
-						System.err.println(documentWordCount);
 						double PwD;
 						if(dir) {
 							PwD = (f+paramSuavizado*(c/collectionWordCount)) / (documentWordCount+paramSuavizado);
@@ -94,7 +93,6 @@ public class FrequencyTools {
 					}
 				}
 			}
-
 			terminosRM1.add(accum + "," + nombreTermino);
 		}
 		Collections.sort(terminosRM1);

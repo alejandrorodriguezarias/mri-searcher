@@ -39,30 +39,29 @@
 	        <argument>-openmode</argument>
 	        <argument>CREATE</argument>
 	       <argument>-indexingmodel</argument>
-	       <argument>dir</argument>
-	       <argument>1000</argument>
+	       <argument>jm</argument>
+	       <argument>0.2</argument>
 	       <argument>-search</argument>
-	       <argument>dir</argument>
-	       <argument>1000</argument>
+	       <argument>jm</argument>
+	       <argument>0.2</argument>
 	      <argument>default</argument>
 	       <argument>-indexin</argument>
 	       <argument>index</argument>
 	       <argument>-cut</argument>
-	       <argument>5</argument>
+	       <argument>6</argument>
 	       <argument>-top</argument>
 	       <argument>2</argument>
 	       <argument>-queries</argument>
-	       <argument>33</argument>
+	       <argument>1</argument>
 	       <argument>-fieldsproc</argument>
 	       <argument>T</argument>
 	       <argument>-fieldsvisual</argument>
 	       <argument>T,B</argument>
 	       <argument>-explain</argument>
 	       <argument>1</argument>
-	       <argument>-rf1</argument>
-	       <argument>6</argument>
-	       <argument>10</argument>
-	       <argument>5</argument>
+	       <argument>-prfjm</argument>
+	       <argument>12</argument>
+	       <argument>3</argument>
 	      </arguments>
 	     </configuration>
 	    </execution>
