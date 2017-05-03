@@ -127,13 +127,15 @@ public class FrequencyTools {
 		return Math.log(N / df_T);
 	}
 
-	public static String[] getBestTermsByIdf(IndexReader reader, String queryContent, String field, int top, Double[] topidfs)
+	public static String[] getBestTermsByIdf(IndexReader reader, String queryContent, String field, int top, double[] topidfs)
 			throws IOException {
 		int N = reader.numDocs();
 		// Creando la lista de terminos y el iterador
 		Fields fields = MultiFields.getFields(reader);
 		Terms terms = fields.terms(field);
+		System.err.println("LOLAS10");
 		List<String> queryContentsplit = Arrays.asList(queryContent.split(" "));
+		System.err.println("LOLAS11");
 		TermsEnum termsEnum = terms.iterator();
 		String[] topterms = new String[top];
 
@@ -214,7 +216,7 @@ public class FrequencyTools {
 				int docx;
 				while ((docx = lista.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
 					Document doc = reader.document(docx);
-					String campoI = doc.get("I"); // Numero de documento
+					String campoI = doc.get("I").trim(); // Numero de documento
 					if (relevantes.contains(campoI)) {
 						// double tf_docOrigen; // Tf en el documento
 						double tf_doc; // Calculo de tf con log
@@ -242,7 +244,7 @@ public class FrequencyTools {
 			}
 		}
 		Collections.sort(terminosTfIdf);
-		Collections.reverse(terminosTfIdf);
+		//Collections.reverse(terminosTfIdf);
 
 		return terminosTfIdf;
 	}

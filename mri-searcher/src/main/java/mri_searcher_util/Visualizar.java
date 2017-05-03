@@ -79,8 +79,8 @@ public class Visualizar {
 			expmetricas[R20] = Metricas.Recallatn(20, expresultados, relevantes);
 			expmetricas[AP] = Metricas.AveragePrecision(expresultados, relevantes, cut);
 
-			sb.append("\nMétricas Q. Expandida: P@10 " + metricas[P10] + " Recall@10 " + metricas[R10] + " P@20 " + metricas[P20]
-					+ " Recall@20 " + metricas[R20] + " AveragePrecision " + metricas[AP] + "\n\n");
+			sb.append("\nMétricas Q. Expandida: P@10 " + expmetricas[P10] + " Recall@10 " + expmetricas[R10] + " P@20 " + metricas[P20]
+					+ " Recall@20 " + expmetricas[R20] + " AveragePrecision " + expmetricas[AP] + "\n\n");
 		}
 	}
 
@@ -127,19 +127,26 @@ public class Visualizar {
 		return sb.toString();
 	}
 	
-	public static final String explain_rf1(int query, List<String> docTerms, List<String> idfsDoc, List<String> tfsDoc, String[] queryTerms, Double[] idfsQuery) {
+	public static final String explain_rf1(int query, List<String> docTerms, List<String> idfsDoc, List<String> tfsDoc, String[] queryTerms, double[] idfsQuery) {
 		StringBuilder sb = new StringBuilder();
+		System.err.println("EXPLAIN1");
+		System.err.println("LFNRKG: " + query);
 		sb.append("Query " + query + ": " + DiccionarioQueries.getContent(query) + "\n");
+		System.err.println("EXPLAIN2");
 		sb.append("Se expande con:\n");
 		
 		sb.append("\nTérminos extraídos de la query\n");
 		for(int i=0; i<queryTerms.length; i++) {
+			System.err.println("EXPLAIN3");
 			sb.append("Término: " + queryTerms[i] + " idf: " + idfsQuery[i] + "\n");
+			System.err.println("EXPLAIN4");
 		}
 		
 		sb.append("\nTérminos extraídos de documentos relevantes\n");
 		for(int i=0; i<docTerms.size(); i++) {
+			System.err.println("EXPLAIN5");
 			sb.append("Término: " + docTerms.get(i) + " idf: " + idfsDoc.get(i) + " tf: " + tfsDoc.get(i) + "\n");
+			System.err.println("EXPLAIN6");
 		}
 		
 		return sb.toString();
