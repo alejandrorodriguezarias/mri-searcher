@@ -40,26 +40,29 @@
 	        <argument>CREATE</argument>
 	       <argument>-indexingmodel</argument>
 	       <argument>dir</argument>
-	       <argument>2</argument>
+	       <argument>1000</argument>
 	       <argument>-search</argument>
 	       <argument>dir</argument>
-	       <argument>0.2</argument>
+	       <argument>1000</argument>
 	      <argument>default</argument>
 	       <argument>-indexin</argument>
 	       <argument>index</argument>
 	       <argument>-cut</argument>
 	       <argument>5</argument>
 	       <argument>-top</argument>
-	       <argument>7</argument>
+	       <argument>2</argument>
 	       <argument>-queries</argument>
-	       <argument>33</argument>
+	       <argument>33-36</argument>
 	       <argument>-fieldsproc</argument>
 	       <argument>T</argument>
 	       <argument>-fieldsvisual</argument>
 	       <argument>T,B</argument>
-	       <argument>-prfdir</argument>
+	       <argument>-explain</argument>
+	       <argument>1</argument>
+	       <argument>-rf1</argument>
 	       <argument>6</argument>
 	       <argument>10</argument>
+	       <argument>5</argument>
 	      </arguments>
 	     </configuration>
 	    </execution>
