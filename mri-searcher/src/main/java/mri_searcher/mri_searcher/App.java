@@ -13,16 +13,8 @@ import mri_searcher_util.Suavizador;
 public class App {
 	
 
-	final static String usage = "java es.udc.fic.mri_indexer.IndexFiles"
-			+ " -index INDEX_PATH -coll DOC_PATH [-openmode CREATE|CREATE_OR_APPEND|APPEND]"
-			+ "[-indexingmodel default|jm lambda| dir mu";
+	final static String usage = "java es.udc.fic.mri_indexer.IndexFiles [options...]";
 
-	/*
-	 * public static void main( String[] args ) { Indexer indexer = new
-	 * Indexer(Paths.get("index"),Paths.get("Collection"),
-	 * OpenMode.CREATE_OR_APPEND); try { indexer.index(); } catch (IOException
-	 * e) { System.err.println("Falló la indexación :^("); } }
-	 */
 	public static void main(String[] args) {
 		CommandLine cl = new CommandLine();
 		cl.triturar(args);
@@ -130,6 +122,7 @@ public class App {
 				indXr.index();
 			} catch (IOException e) {
 				System.err.println("Falló la indexación :^(");
+				e.printStackTrace();
 			}
 		}
 	}
