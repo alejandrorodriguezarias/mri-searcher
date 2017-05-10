@@ -123,18 +123,18 @@ public class Searcher {
 							tfsDoc.add(split[2]);
 							idfsDoc.add(split[3]);
 						}
-						expQueryContent = queryExpandida(queryContent, termsTfidf, queryTerms);
+						expQueryContent = queryExpandida("", termsTfidf, queryTerms);
 					} else if (rfMode == 2) {
 						List<String> titulos = FrequencyTools.obtenerTitulos(reader, topDocs[i], ndr);
 						expQueryContent = queryExpandidatitulo(queryContent, titulos);
 					} else if (rfMode == 3) {
 						valuesRM1 = new ArrayList<String>();
 						termsRM1 = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,paramSuavizado,false,valuesRM1);
-						expQueryContent = queryExpandidatitulo(queryContent, termsRM1);
+						expQueryContent = queryExpandidatitulo("", termsRM1);
 					} else if (rfMode == 4) {
 						valuesRM1 = new ArrayList<String>();
 						termsRM1 = FrequencyTools.obtenerRankingRM1(topDocs[i],reader,BODYFIELD,td,ndr,paramSuavizado,true,valuesRM1);
-						expQueryContent = queryExpandidatitulo(queryContent, termsRM1);
+						expQueryContent = queryExpandidatitulo("", termsRM1);
 					}
 
 					if (rfMode != 0) {
@@ -179,7 +179,6 @@ public class Searcher {
 		sb.append(queryContent);
 		for (String s : titulos)
 			sb.append(s + " ");
-		System.err.println(sb.toString());
 		return sb.toString();
 	}
 	
